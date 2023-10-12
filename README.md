@@ -1,4 +1,4 @@
-# Twilio Media Streams
+# Generative AI Phone Calling
 
 Generative AI is producing a bunch of fun new models for us devs to poke at. Did you know you can use these over the phone?
 
