@@ -1,54 +1,64 @@
-const { WebSocketServer } = require("ws");
-const { Deepgram } = require("@deepgram/sdk");
+require("dotenv").config();
+const express = require("express");
+const ExpressWs = require("express-ws");
 
-const PORT = 8080;
+const { TextToSpeechService } = require("./tts-service");
+const { TranscriptionService } = require("./transcription-service");
 
-const wss = new WebSocketServer({
-  port: PORT,
+const app = express();
+ExpressWs(app);
+
+const PORT = 3000;
+
+app.post("/incoming", (req, res) => {
+  res.status(200);
+  res.type("text/xml");
+  res.end(`
+  <Response>
+    <Connect>
+      <Stream url="wss://${process.env.SERVER}/connection" />
+    </Connect>
+  </Response>
+  `);
 });
 
-wss.on("connection", function connection(ws) {
+app.ws("/connection", (ws, req) => {
   ws.on("error", console.error);
-  const deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY);
-  const deepgramLive = deepgram.transcription.live({
-    encoding: "mulaw",
-    sample_rate: "8000",
-    model: "nova",
-    interim_results: false
-  });
+  // Filled in from start message
+  let streamSid;
+
+  const transcriptionService = new TranscriptionService();
+  const ttsService = new TextToSpeechService({});
 
   // Incoming from MediaStream
   ws.on("message", function message(data) {
     const msg = JSON.parse(data);
     if (msg.event === "start") {
-      console.log(`Starting Media Stream`);
+      streamSid = msg.start.streamSid;
+      console.log(`Starting Media Stream for ${streamSid}`);
     } else if (msg.event === "media") {
-      // TODO: Buffer up the media and then send
-      if (deepgramLive.getReadyState() === 1) {
-        //console.log(`Sending for ${data}`);
-        deepgramLive.send(Buffer.from(msg.media.payload, "base64"));
-      }
+      transcriptionService.send(msg.media.payload);
     }
   });
 
-  deepgramLive.addListener("error", (error) => {
-    console.error("deepgram error");
-    console.error(error);
+  transcriptionService.on("transcription", (text) => {
+    console.log(`Received transcription: ${text}`);
+    ttsService.generate(text);
   });
 
-
-  deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
-    const transcription = JSON.parse(transcriptionMessage);
-    //console.log(`transcriptionMessage: ${transcriptionMessage}`);
-    console.log(transcription.channel?.alternatives[0]?.transcript);
+  ttsService.on("speech", (audio) => {
+    console.log(`Sending audio to Twilio ${audio.length} b64 characters`);
+    ws.send(
+      JSON.stringify({
+        streamSid,
+        event: "media",
+        media: {
+          payload: audio,
+        },
+      })
+    );
   });
-
-  deepgramLive.addListener("close", () => {
-    console.log("Deepgram connection closed");
-  });
-
-
-  // ws.send("something");
 });
 
-console.log(`WebSocket Server running on port ${PORT}`);
+app.listen(PORT);
+console.log(`Server running on port ${PORT}`);
