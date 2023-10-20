@@ -10,7 +10,7 @@ class TextToSpeechService extends EventEmitter {
   }
 
   async generate(text) {
-    const outputFormat = "pcm_24000";
+    const outputFormat = "pcm_16000";
     // Docs say Query Params...so I appended...it is POST so :shrug:
     // `pcm_44100` is causing a 403
     const response = await fetch(
@@ -33,7 +33,7 @@ class TextToSpeechService extends EventEmitter {
       const audioArrayBuffer = await response.arrayBuffer();
       const wav = new WaveFile();
       // TODO: I am not sure this is right (or how to know)
-      wav.fromScratch(2, 24000, '24', new Uint16Array(audioArrayBuffer));
+      wav.fromScratch(1, 16000, '16', new Uint16Array(audioArrayBuffer));
       wav.toSampleRate(8000);
       wav.toMuLaw();
       // Do not send the WAV headers (that's why `data.samples`)
