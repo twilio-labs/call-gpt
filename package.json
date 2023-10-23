@@ -1,6 +1,6 @@
 {
-  "name": "deepgram-elevenlabs",
-  "version": "1.0.0",
+  "name": "genai-phone",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
