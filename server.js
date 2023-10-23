@@ -38,6 +38,9 @@ app.ws("/connection", (ws, req) => {
       console.log(`Starting Media Stream for ${streamSid}`);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
+    } else if (msg.event === "mark") {
+      const label = msg.mark.name;
+      console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`)
     }
   });
 
@@ -46,7 +49,7 @@ app.ws("/connection", (ws, req) => {
     ttsService.generate(text);
   });
 
-  ttsService.on("speech", (audio) => {
+  ttsService.on("speech", (audio, label) => {
     console.log(`Sending audio to Twilio ${audio.length} b64 characters`);
     ws.send(
       JSON.stringify({
@@ -57,6 +60,16 @@ app.ws("/connection", (ws, req) => {
         },
       })
     );
+    // When the media completes you will receive a `mark` message with the label
+    ws.send(
+      JSON.stringify({
+        streamSid,
+        event: "mark",
+        mark: {
+          name: label
+        }
+      })
+    )
   });
 });
 
