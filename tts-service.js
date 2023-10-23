@@ -33,7 +33,7 @@ class TextToSpeechService extends EventEmitter {
       const audioArrayBuffer = await response.arrayBuffer();
       const wav = new WaveFile();
       // TODO: I am not sure this is right (or how to know)
-      wav.fromScratch(1, 16000, '16', new Uint16Array(audioArrayBuffer));
+      wav.fromScratch(1, 16000, '16', new Int16Array(audioArrayBuffer));
       wav.toSampleRate(8000);
       wav.toMuLaw();
       // Do not send the WAV headers (that's why `data.samples`)
