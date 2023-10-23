@@ -24,6 +24,7 @@ class TextToSpeechService extends EventEmitter {
         },
         // TODO: Pull more config? https://docs.elevenlabs.io/api-reference/text-to-speech-stream
         body: JSON.stringify({
+          model_id: process.env.XI_MODEL_ID,
           text,
         }),
       }
