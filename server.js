@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const ExpressWs = require("express-ws");
+const OpenAI = require('openai');
+const uuid = require('uuid');
 
 const { TextToSpeechService } = require("./tts-service");
 const { TranscriptionService } = require("./transcription-service");
@@ -9,18 +11,44 @@ const app = express();
 ExpressWs(app);
 
 const PORT = 3000;
+const openai = new OpenAI();
+
 
 app.post("/incoming", (req, res) => {
   res.status(200);
   res.type("text/xml");
   res.end(`
   <Response>
+    <Play>https://maize-earwig-4391.twil.io/assets/ElevenLabs_2023-12-01T06_57_02_Rachel_pre_s50_sb75_se0_b_m2.mp3</Play>
     <Connect>
       <Stream url="wss://${process.env.SERVER}/connection" />
     </Connect>
   </Response>
   `);
 });
+
+async function getGPTResponse(text, ttsService) {
+  const stream = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {"role": "system", "content": "You are a helpful assistant chatting with a user on the phone. Keep your responses cheerful and brief."},
+      {"role": "user", "content": text}
+    ],
+    stream: true,
+  });
+
+  let textBuffer = ""
+  for await (const chunk of stream) {
+    let content = chunk.choices[0]?.delta?.content || ""
+    if(content.slice(-1) === "." || content.slice(-1) === "!") {
+      console.log(textBuffer)
+      await ttsService.generate(textBuffer)
+      textBuffer = ""
+    } else {
+      textBuffer += content 
+    }
+  }
+}
 
 app.ws("/connection", (ws, req) => {
   ws.on("error", console.error);
@@ -29,7 +57,7 @@ app.ws("/connection", (ws, req) => {
 
   const transcriptionService = new TranscriptionService();
   const ttsService = new TextToSpeechService({});
-
+  let marks = []
   // Incoming from MediaStream
   ws.on("message", function message(data) {
     const msg = JSON.parse(data);
@@ -41,12 +69,22 @@ app.ws("/connection", (ws, req) => {
     } else if (msg.event === "mark") {
       const label = msg.mark.name;
       console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`)
+      marks = marks.filter(m => m === msg.mark.name)
     }
   });
 
-  transcriptionService.on("transcription", (text) => {
+  transcriptionService.on("transcription", async (text) => {
     console.log(`Received transcription: ${text}`);
-    ttsService.generate(text);
+    if(marks.length > 0) {
+      console.log("Clearing stream")
+      ws.send(
+        JSON.stringify({
+          streamSid,
+          event: "clear",
+        })
+      );
+    }
+    await getGPTResponse(text, ttsService)
   });
 
   ttsService.on("speech", (audio, label) => {
@@ -61,15 +99,17 @@ app.ws("/connection", (ws, req) => {
       })
     );
     // When the media completes you will receive a `mark` message with the label
+    const markLabel = uuid.v4()
     ws.send(
       JSON.stringify({
         streamSid,
         event: "mark",
         mark: {
-          name: label
+          name: markLabel
         }
       })
     )
+    marks.push(markLabel)
   });
 });
 

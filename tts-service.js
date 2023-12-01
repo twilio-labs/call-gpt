@@ -1,7 +1,5 @@
 const EventEmitter = require("events");
 
-const { WaveFile } = require("wavefile");
-
 class TextToSpeechService extends EventEmitter {
   constructor(config) {
     super();
@@ -10,7 +8,7 @@ class TextToSpeechService extends EventEmitter {
   }
 
   async generate(text) {
-    const outputFormat = "pcm_16000";
+    const outputFormat = "ulaw_8000";
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${this.config.voiceId}/stream?output_format=${outputFormat}`,
       {
@@ -30,14 +28,8 @@ class TextToSpeechService extends EventEmitter {
     console.log(`Response status from elevenlabs: ${response.status}`);
     try {
       const audioArrayBuffer = await response.arrayBuffer();
-      const wav = new WaveFile();
-      // TODO: I am not sure this is right (or how to know)
-      wav.fromScratch(1, 16000, '16', new Int16Array(audioArrayBuffer));
-      wav.toSampleRate(8000);
-      wav.toMuLaw();
       const label = text;
-      // Do not send the WAV headers (that's why `data.samples`)
-      this.emit("speech", Buffer.from(wav.data.samples).toString("base64"), label);
+      this.emit("speech", Buffer.from(audioArrayBuffer).toString("base64"), label);
     } catch (err) {
       console.error("Error occurred in TextToSpeech service");
       console.error(err);

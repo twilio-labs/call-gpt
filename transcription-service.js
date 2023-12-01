@@ -13,6 +13,7 @@ class TranscriptionService extends EventEmitter {
       model: "nova",
       punctuate: true,
       interim_results: false,
+      endpointing: 300,
     });
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
