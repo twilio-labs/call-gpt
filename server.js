@@ -73,8 +73,7 @@ app.ws("/connection", (ws, req) => {
     }
   });
 
-  transcriptionService.on("transcription", async (text) => {
-    console.log(`Received transcription: ${text}`);
+  transcriptionService.on("utterance", async (text) => {
     if(marks.length > 0) {
       console.log("Clearing stream")
       ws.send(
@@ -84,6 +83,10 @@ app.ws("/connection", (ws, req) => {
         })
       );
     }
+  })
+
+  transcriptionService.on("transcription", async (text) => {
+    console.log(`Received final transcription: ${text}`);
     await getGPTResponse(text, ttsService)
   });
 

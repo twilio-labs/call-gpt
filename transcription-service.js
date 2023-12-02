@@ -3,7 +3,6 @@ const EventEmitter = require("events");
 
 
 class TranscriptionService extends EventEmitter {
-
   constructor() {
     super();
     const deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY);
@@ -12,14 +11,17 @@ class TranscriptionService extends EventEmitter {
       sample_rate: "8000",
       model: "nova",
       punctuate: true,
-      interim_results: false,
+      interim_results: true,
       endpointing: 300,
     });
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
       const text = transcription.channel?.alternatives[0]?.transcript;
-      if (text) {
+      if (transcription.is_final === true) {
         this.emit("transcription", text);
+      } else {
+        console.log("utterance")
+        this.emit("utterance", text);
       }
     });
     this.deepgramLive.addListener("error", (error) => {
