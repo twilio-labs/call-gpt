@@ -74,8 +74,8 @@ app.ws("/connection", (ws, req) => {
   });
 
   transcriptionService.on("utterance", async (text) => {
-    if(marks.length > 0) {
-      console.log("Clearing stream")
+    if(marks.length > 0 && text.length > 5) {
+      console.log("Interruption, Clearing stream")
       ws.send(
         JSON.stringify({
           streamSid,
@@ -87,7 +87,9 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("transcription", async (text) => {
     console.log(`Received final transcription: ${text}`);
-    await getGPTResponse(text, ttsService)
+    if (text) {
+      await getGPTResponse(text, ttsService)
+    }
   });
 
   ttsService.on("speech", (audio, label) => {

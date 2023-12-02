@@ -12,7 +12,7 @@ class TranscriptionService extends EventEmitter {
       model: "nova",
       punctuate: true,
       interim_results: true,
-      endpointing: 300,
+      endpointing: 500,
     });
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
@@ -20,7 +20,6 @@ class TranscriptionService extends EventEmitter {
       if (transcription.is_final === true) {
         this.emit("transcription", text);
       } else {
-        console.log("utterance")
         this.emit("utterance", text);
       }
     });
