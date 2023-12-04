@@ -49,6 +49,8 @@ app.ws("/connection", (ws, req) => {
       const label = msg.mark.name;
       console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`)
       marks = marks.filter(m => m === msg.mark.name)
+    } else if (msg.event === "stop") {
+      console.log(`Media stream ${streamSid} ended.`)
     }
   });
 
