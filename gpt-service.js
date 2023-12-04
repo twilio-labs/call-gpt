@@ -10,7 +10,7 @@ class GptService extends EventEmitter {
     ]
   }
 
-  async completion(text) {
+  async completion(text, interactionCount) {
     this.userContext.push({"role": "user", "content": text})
 
     const stream = await this.openai.chat.completions.create({
@@ -27,7 +27,7 @@ class GptService extends EventEmitter {
       completeResponse += content;
       if(content.slice(-1) === "." || content.slice(-1) === "!") {
         console.log(partialResponse)
-        this.emit("gptreply", partialResponse);
+        this.emit("gptreply", partialResponse, interactionCount);
         partialResponse = ""
       } else {
         partialResponse += content 

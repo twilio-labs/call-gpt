@@ -36,6 +36,7 @@ app.ws("/connection", (ws, req) => {
   const transcriptionService = new TranscriptionService();
   const ttsService = new TextToSpeechService({});
   let marks = []
+  let interactionCount = 0
   // Incoming from MediaStream
   ws.on("message", function message(data) {
     const msg = JSON.parse(data);
@@ -65,19 +66,18 @@ app.ws("/connection", (ws, req) => {
   })
 
   transcriptionService.on("transcription", async (text) => {
-    console.log(`Received final transcription: ${text}`);
-    if (text) {
-      gptService.completion(text);
-    }
+    console.log(`Interaction ${interactionCount}: Received final transcription: ${text}`);
+    gptService.completion(text, interactionCount);
+    interactionCount += 1;
   });
   
-  gptService.on('gptreply', async (text) => {
-    console.log('Sending GPT reply to TTS service...')
-    ttsService.generate(text);
+  gptService.on('gptreply', async (text, icount) => {
+    console.log(`Interaction ${icount}: Sending GPT reply to TTS service: ${text}` )
+    ttsService.generate(text, icount);
   });
 
-  ttsService.on("speech", (audio, label) => {
-    console.log(`Sending audio to Twilio ${audio.length} b64 characters`);
+  ttsService.on("speech", (audio, label, icount) => {
+    console.log(`Interaction ${icount}: Sending audio to Twilio ${audio.length} b64 characters: ${label}`);
     ws.send(
       JSON.stringify({
         streamSid,

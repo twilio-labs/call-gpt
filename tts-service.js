@@ -7,7 +7,7 @@ class TextToSpeechService extends EventEmitter {
     this.config.voiceId ||= process.env.VOICE_ID;
   }
 
-  async generate(text) {
+  async generate(text, interactionCount) {
     const outputFormat = "ulaw_8000";
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${this.config.voiceId}/stream?output_format=${outputFormat}`,
@@ -25,11 +25,10 @@ class TextToSpeechService extends EventEmitter {
         }),
       }
     );
-    console.log(`Response status from elevenlabs: ${response.status}`);
     try {
       const audioArrayBuffer = await response.arrayBuffer();
       const label = text;
-      this.emit("speech", Buffer.from(audioArrayBuffer).toString("base64"), label);
+      this.emit("speech", Buffer.from(audioArrayBuffer).toString("base64"), label, interactionCount);
     } catch (err) {
       console.error("Error occurred in TextToSpeech service");
       console.error(err);
