@@ -3,14 +3,14 @@ const express = require("express");
 const ExpressWs = require("express-ws");
 const uuid = require('uuid');
 
-const { TextToSpeechService } = require("./tts-service");
-const { TranscriptionService } = require("./transcription-service");
-const { GptService } = require("./gpt-service");
+const { TextToSpeechService } = require("./services/tts-service");
+const { TranscriptionService } = require("./services/transcription-service");
+const { GptService } = require("./services/gpt-service");
 
 const app = express();
 ExpressWs(app);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.post("/incoming", (req, res) => {
   res.status(200);
@@ -35,8 +35,10 @@ app.ws("/connection", (ws, req) => {
   const gptService = new GptService();
   const transcriptionService = new TranscriptionService();
   const ttsService = new TextToSpeechService({});
+  
   let marks = []
   let interactionCount = 0
+
   // Incoming from MediaStream
   ws.on("message", function message(data) {
     const msg = JSON.parse(data);
@@ -68,17 +70,20 @@ app.ws("/connection", (ws, req) => {
   })
 
   transcriptionService.on("transcription", async (text) => {
+    console.time(`Interaction ${interactionCount}`)
     console.log(`Interaction ${interactionCount}: Received final transcription: ${text}`);
     gptService.completion(text, interactionCount);
     interactionCount += 1;
   });
   
   gptService.on('gptreply', async (text, icount) => {
+    console.timeLog(`Interaction ${interactionCount}`)
     console.log(`Interaction ${icount}: Sending GPT reply to TTS service: ${text}` )
     ttsService.generate(text, icount);
   });
 
   ttsService.on("speech", (audio, label, icount) => {
+    console.timeLog(`Interaction ${interactionCount}`)
     console.log(`Interaction ${icount}: Sending audio to Twilio ${audio.length} b64 characters: ${label}`);
     ws.send(
       JSON.stringify({

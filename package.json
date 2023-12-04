@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/test-call.js"
+    "test": "node ./test/test-call.js",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +20,9 @@
     "twilio": "^4.19.3",
     "uuid": "^9.0.1",
     "wavefile": "^11.0.0"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.11",
+    "nodemon": "^3.0.2"
   }
 }

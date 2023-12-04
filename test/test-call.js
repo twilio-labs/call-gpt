@@ -8,7 +8,7 @@ async function makeTestCall() {
   const client = require('twilio')(accountSid, authToken);
   
   let twiml = new VoiceResponse();
-  twiml.pause({ length: 30 });
+  twiml.pause({ length: 10 });
   twiml.say('Which came first, the invention of the telephone or SMS?')
   twiml.pause({ length: 30 });
 
