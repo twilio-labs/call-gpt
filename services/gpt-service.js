@@ -6,7 +6,7 @@ class GptService extends EventEmitter {
     super();
     this.openai = new OpenAI();
     this.userContext = [
-      {"role": "system", "content": "You are a helpful assistant chatting with a user on the phone. Keep your responses cheerful and brief. If you receive a query that is not a complete sentence, respond with an empty string."},
+      {"role": "system", "content": "You are a helpful assistant chatting with a user on the phone. Keep your responses cheerful and brief. Add a '•' symbol every 5 to 10 words at natural pauses where your response can be split for text to speech."},
     ]
   }
 
@@ -25,7 +25,7 @@ class GptService extends EventEmitter {
     for await (const chunk of stream) {
       let content = chunk.choices[0]?.delta?.content || ""
       completeResponse += content;
-      if(content.slice(-1) === "." || content.slice(-1) === "!") {
+      if(content.trim().slice(-1) === "•") {
         console.log(partialResponse)
         this.emit("gptreply", partialResponse, interactionCount);
         partialResponse = ""
