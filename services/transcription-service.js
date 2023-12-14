@@ -20,7 +20,7 @@ class TranscriptionService extends EventEmitter {
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
       const text = transcription.channel?.alternatives[0]?.transcript;
-      if (transcription.is_final === true) {
+      if (transcription.is_final === true && text.trim().length > 0) {
         this.finalResult += ` ${text}`;
         if (transcription.speech_final === true) {
           this.emit("transcription", this.finalResult);
