@@ -21,7 +21,7 @@ class TranscriptionService extends EventEmitter {
       const transcription = JSON.parse(transcriptionMessage);
       const text = transcription.channel?.alternatives[0]?.transcript;
       if (transcription.is_final === true) {
-        this.finalResult += text;
+        this.finalResult += ` ${text}`;
         if (transcription.speech_final === true) {
           this.emit("transcription", this.finalResult);
           this.finalResult = "";

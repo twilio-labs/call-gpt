@@ -17,6 +17,7 @@ app.post("/incoming", (req, res) => {
   res.type("text/xml");
   res.end(`
   <Response>
+    <Play>https://maize-earwig-4391.twil.io/assets/ElevenLabs_2023-12-01T06_57_02_Rachel_pre_s50_sb75_se0_b_m2.mp3</Play>
     <Connect>
       <Stream url="wss://${process.env.SERVER}/connection" />
     </Connect>
@@ -24,7 +25,6 @@ app.post("/incoming", (req, res) => {
   `);
 });
 
-// <Play>https://maize-earwig-4391.twil.io/assets/ElevenLabs_2023-12-01T06_57_02_Rachel_pre_s50_sb75_se0_b_m2.mp3</Play>
 
 
 app.ws("/connection", (ws, req) => {
@@ -58,7 +58,7 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("utterance", async (text) => {
     // This is a bit of a hack to filter out empty utterances
-    if(marks.length > 0 && text?.length > 3) {
+    if(marks.length > 0 && text?.length > 5) {
       console.log("Interruption, Clearing stream")
       ws.send(
         JSON.stringify({
