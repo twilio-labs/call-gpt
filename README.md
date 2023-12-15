@@ -44,7 +44,7 @@ npm run dev
 Wire up your Twilio number using the console or CLI
 
 ```bash
-twilio phone-numbers:update +18889876 --voice-url=https://your-server.ngrok.io/incoming
+twilio phone-numbers:update +1[your-twilio-number] --voice-url=https://your-server.ngrok.io/incoming
 ```
 
 There is a [Stream](https://www.twilio.com/docs/voice/twiml/stream) TwiML verb that will connect a stream to your websocket server.
