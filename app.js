@@ -45,6 +45,7 @@ app.ws("/connection", (ws, req) => {
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       console.log(`Starting Media Stream for ${streamSid}`);
+      ttsService.generate("Hey is this mark?", 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
@@ -70,20 +71,22 @@ app.ws("/connection", (ws, req) => {
   })
 
   transcriptionService.on("transcription", async (text) => {
-    console.time(`Interaction ${interactionCount}`)
+    // console.time(`Interaction ${interactionCount}`)
     console.log(`Interaction ${interactionCount}: Received final transcription: ${text}`);
-    gptService.completion(text, interactionCount);
+    if (text.trim().length > 1) {
+      gptService.completion(text, interactionCount);
     interactionCount += 1;
+    }
   });
   
   gptService.on('gptreply', async (text, icount) => {
-    console.timeLog(`Interaction ${interactionCount}`)
+    // console.timeLog(`Interaction ${interactionCount}`)
     console.log(`Interaction ${icount}: Sending GPT reply to TTS service: ${text}` )
     ttsService.generate(text, icount);
   });
 
   ttsService.on("speech", (audio, label, icount) => {
-    console.timeLog(`Interaction ${interactionCount}`)
+    // console.timeLog(`Interaction ${interactionCount}`)
     console.log(`Interaction ${icount}: Sending audio to Twilio ${audio.length} b64 characters: ${label}`);
     ws.send(
       JSON.stringify({
