@@ -17,8 +17,8 @@ async function makeTestCall() {
   await client.calls
     .create({
         twiml: twiml.toString(),
-        to: process.env.FROM_NUMBER,
-        from: process.env.TO_NUMBER
+        to: process.env.TO_NUMBER,
+        from: process.env.FROM_NUMBER
       })
     .then(call => console.log(call.sid));
 }  
