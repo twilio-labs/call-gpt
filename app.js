@@ -45,7 +45,7 @@ app.ws("/connection", (ws, req) => {
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       console.log(`Starting Media Stream for ${streamSid}`);
-      ttsService.generate("Hey is this mark?", 1);
+      ttsService.generate("Hello! I understand you're looking for a pair of AirPods, is that correct?", 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
@@ -59,7 +59,7 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("utterance", async (text) => {
     // This is a bit of a hack to filter out empty utterances
-    if(marks.length > 0 && text?.length > 5) {
+    if(marks.length > 0 && text?.length >= 2) {
       console.log("Interruption, Clearing stream")
       ws.send(
         JSON.stringify({

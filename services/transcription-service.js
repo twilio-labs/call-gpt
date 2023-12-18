@@ -12,7 +12,7 @@ class TranscriptionService extends EventEmitter {
       model: "nova-2",
       punctuate: true,
       interim_results: true,
-      endpointing: 500,
+      endpointing: 200,
     });
 
     this.finalResult = "";
@@ -20,16 +20,19 @@ class TranscriptionService extends EventEmitter {
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
       const text = transcription.channel?.alternatives[0]?.transcript;
-      console.log(text, "is_final: ", transcription.is_final, "speech_final: ", transcription.speech_final);
-      if (transcription.is_final === true) {
-        this.finalResult += text;
-        if (transcription.speech_final === true) {
-          this.emit("transcription", this.finalResult);
-          this.finalResult = "";
+      console.log(text, "is_final: ", transcription?.is_final, "speech_final: ", transcription.speech_final);
+      // if (transcription.is_final === true) {
+      //   this.finalResult += text;
+        if (transcription.speech_final === true || transcription.is_final === true) {
+          if (text.trim().length > 1) {
+            this.emit("transcription", text);
+            this.finalResult = "";
+          }
+          
         }
-      } else {
-        this.emit("utterance", text);
-      }
+      // } else {
+      //   this.emit("utterance", text);
+      // }
     });
 
     this.deepgramLive.addListener("error", (error) => {
