@@ -243,6 +243,8 @@ class GptService extends EventEmitter {
           }
         }
       }
+    
+      this.userContext.push({"role": "assistant", "content": completeResponse})
     }
   }
 }
