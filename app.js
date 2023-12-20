@@ -45,6 +45,7 @@ app.ws("/connection", (ws, req) => {
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       console.log(`Starting Media Stream for ${streamSid}`);
+      ttsService.generate("Hello! I understand you're looking for a pair of AirPods, is that correct?", 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
@@ -70,10 +71,18 @@ app.ws("/connection", (ws, req) => {
   });
 
   transcriptionService.on("transcription", async (text) => {
+<<<<<<< HEAD
     if (!text) { return; }
     console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
     gptService.completion(text, interactionCount);
+=======
+    // console.time(`Interaction ${interactionCount}`)
+    console.log(`Interaction ${interactionCount}: Received final transcription: ${text}`);
+    if (text.trim().length > 1) {
+      gptService.completion(text, interactionCount);
+>>>>>>> mdvickst-vickstrom-dev
     interactionCount += 1;
+    }
   });
   
   gptService.on('gptreply', async (text, icount) => {

@@ -12,7 +12,7 @@ class TranscriptionService extends EventEmitter {
       model: "nova-2",
       punctuate: true,
       interim_results: true,
-      endpointing: 500,
+      endpointing: 200,
     });
 
     this.finalResult = "";
@@ -25,19 +25,30 @@ class TranscriptionService extends EventEmitter {
         if (transcription.speech_final === true) {
           this.emit("transcription", this.finalResult);
           this.finalResult = "";
+        } else {
+          this.emit("utterance", text);
         }
-      } else {
-        this.emit("utterance", text);
       }
     });
 
     this.deepgramLive.addListener("error", (error) => {
-      console.error("deepgram error");
+      console.error("STT -> deepgram error");
       console.error(error);
     });
+
+    this.deepgramLive.addListener("warning", (warning) => {
+      console.error("STT -> deepgram warning");
+      console.error(warning);
+    });
+
+    this.deepgramLive.addListener("metadata", (metadata) => {
+      console.error("STT -> deepgram metadata");
+      console.error(metadata);
+    });
+    
     
     this.deepgramLive.addListener("close", () => {
-      console.log("Deepgram connection closed");
+      console.log("STT -> Deepgram connection closed");
     });
   }
 
