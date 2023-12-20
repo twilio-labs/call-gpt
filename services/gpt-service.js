@@ -1,5 +1,6 @@
 const EventEmitter = require("events");
 const OpenAI = require('openai');
+const tools = require('../config/tools');
 
 function check_inventory(model) {
   console.log("GPT -> called check_inventory");
@@ -60,99 +61,6 @@ class GptService extends EventEmitter {
       check_price: check_price,
       place_order: place_order,
     };
-
-    // create metadata for all the available functions to pass to completions API
-    const tools = [
-      {
-        type: "function",
-        function: {
-          name: "check_inventory",
-          description: "Check the inventory of airpods, airpods pro or airpods max.",
-          parameters: {
-            type: "object",
-            properties: {
-              model: {
-                type: "string",
-                "enum": ["airpods", "airpods pro", "airpods max"],
-                description: "The model of airpods, either the airpods, airpods pro or airpods max",
-              },
-            },
-            required: ["model"],
-          },
-          returns: {
-            type: "object",
-            properties: {
-              stock: {
-                type: "integer",
-                description: "An integer containing how many of the model are in currently in stock."
-              }
-            }
-          }
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "check_price",
-          description: "Check the price of given model of airpods, airpods pro or airpods max.",
-          parameters: {
-            type: "object",
-            properties: {
-              model: {
-                type: "string",
-                "enum": ["airpods", "airpods pro", "airpods max"],
-                description: "The model of airpods, either the airpods, airpods pro or airpods max",
-              },
-            },
-            required: ["model"],
-          },
-          returns: {
-            type: "object",
-            properties: {
-              price: {
-                type: "integer",
-                description: "the price of the model"
-              }
-            }
-          }
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "place_order",
-          description: "Places an order for a set of airpods.",
-          parameters: {
-            type: "object",
-            properties: {
-              model: {
-                type: "string",
-                "enum": ["airpods", "airpods pro"],
-                description: "The model of airpods, either the regular or pro",
-              },
-              quantity: {
-                type: "integer",
-                description: "The number of airpods they want to order",
-              },
-            },
-            required: ["type", "quantity"],
-          },
-          returns: {
-            type: "object",
-            properties: {
-              price: {
-                type: "integer",
-                description: "The total price of the order"
-              },
-              orderNumber: {
-                type: "integer",
-                description: "The order number associated with the order."
-              }
-            }
-          }
-        },
-      },
-    ];
 
     // Step 1: Send user transcription to Chat GPT
     const stream = await this.openai.chat.completions.create({
@@ -226,20 +134,14 @@ class GptService extends EventEmitter {
       } else {
         completeResponse += content;
         // GPT is done streaming, emit last partial response and add complete response to userContext
-        if (finishReason === "length" || finishReason === "stop" || content.trim().slice(-1) === "•") {
-          // emit the gptreply event for the TTS service to pick up
+        if (content.trim().slice(-1) === "•" || finishReason === "stop") {
+          console.log(partialResponse)
           this.emit("gptreply", partialResponse, interactionCount);
-          // add what the assistant said to the context/conversation history
-          this.userContext.push({ "role": "assistant", "content": completeResponse })
-          return;
-        } else { // GPT is still streaming
+          partialResponse = ""
+        } else {
+          // GPT is still streaming
           // if we've reached the end of a sentence then emit that sentence to be spoken via TTS
           partialResponse += content
-          if (content.slice(-1) === "." || content.slice(-1) === "!") {
-            console.log(partialResponse)
-            this.emit("gptreply", partialResponse, interactionCount);
-            partialResponse = ""
-          }
         }
       }
     

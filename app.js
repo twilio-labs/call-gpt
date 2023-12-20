@@ -71,18 +71,10 @@ app.ws("/connection", (ws, req) => {
   });
 
   transcriptionService.on("transcription", async (text) => {
-<<<<<<< HEAD
     if (!text) { return; }
     console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
     gptService.completion(text, interactionCount);
-=======
-    // console.time(`Interaction ${interactionCount}`)
-    console.log(`Interaction ${interactionCount}: Received final transcription: ${text}`);
-    if (text.trim().length > 1) {
-      gptService.completion(text, interactionCount);
->>>>>>> mdvickst-vickstrom-dev
     interactionCount += 1;
-    }
   });
   
   gptService.on('gptreply', async (text, icount) => {
