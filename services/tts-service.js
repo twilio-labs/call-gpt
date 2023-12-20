@@ -9,6 +9,8 @@ class TextToSpeechService extends EventEmitter {
   }
 
   async generate(text, interactionCount) {
+    if (!text) { return; }
+
     try {
       const outputFormat = "ulaw_8000";
       const response = await fetch(

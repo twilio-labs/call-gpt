@@ -2,7 +2,7 @@ const EventEmitter = require("events");
 const OpenAI = require('openai');
 
 function check_inventory(model) {
-  console.log("check inventory called");
+  console.log("GPT -> called check_inventory");
   if (model?.toLowerCase().includes("pro")) {
     return JSON.stringify({ stock: 10 });
   } else if (model?.toLowerCase().includes("max")) {
@@ -13,7 +13,7 @@ function check_inventory(model) {
 }
 
 function check_price(model) {
-  console.log("check price called");
+  console.log("GPT -> called check_price");
   if (model?.toLowerCase().includes("pro")) {
     return JSON.stringify({ price: 249 });
   } else if (model?.toLowerCase().includes("max")) {
@@ -24,7 +24,7 @@ function check_price(model) {
 }
 
 function place_order(model, quantity) {
-  console.log("place order called");
+  console.log("GPT -> called place_order");
   
   // generate a random order number that is 7 digits 
   orderNum = Math.floor(Math.random() * (9999999 - 1000000 + 1) + 1000000);
@@ -43,7 +43,7 @@ class GptService extends EventEmitter {
     super();
     this.openai = new OpenAI();
     this.userContext = [
-      { "role": "system", "content": "You are an outbound sales representative trying to sell Apple Airpods. You have a youthful and cheery personality. Keep your responses as brief as possible but make every attempt to keep the caller on the phone without being rude. Don't ask more than 1 question at a time. Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous. Speak out all prices to include the currency. Please help them decide between the airpods, airpods pro and airpods max by asking questions like 'Do you prefer headphones that go in your ear or over the ear?'. If they are trying to choose between the airpods and airpods pro try asking them if they need noise canceling. Once you know which model they would like ask them how many they would like to purchase and try to get them to place an order." },
+      { "role": "system", "content": "You are an outbound sales representative selling Apple Airpods. You have a youthful and cheery personality. Keep your responses as brief as possible but make every attempt to keep the caller on the phone without being rude. Don't ask more than 1 question at a time. Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous. Speak out all prices to include the currency. Please help them decide between the airpods, airpods pro and airpods max by asking questions like 'Do you prefer headphones that go in your ear or over the ear?'. If they are trying to choose between the airpods and airpods pro try asking them if they need noise canceling. Once you know which model they would like ask them how many they would like to purchase and try to get them to place an order." },
       { "role": "assistant", "content": "Hello! I understand you're looking for a pair of AirPods, is that correct?" },
     ]
   }
@@ -94,7 +94,7 @@ class GptService extends EventEmitter {
         type: "function",
         function: {
           name: "check_price",
-          description: "Check the price of given model of airpods, airpods pro or airpods max. Returns a string that can",
+          description: "Check the price of given model of airpods, airpods pro or airpods max.",
           parameters: {
             type: "object",
             properties: {
@@ -121,7 +121,7 @@ class GptService extends EventEmitter {
         type: "function",
         function: {
           name: "place_order",
-          description: "Check the inventory of airpods or airpods pro.",
+          description: "Places an order for a set of airpods.",
           parameters: {
             type: "object",
             properties: {

@@ -32,12 +32,23 @@ class TranscriptionService extends EventEmitter {
     });
 
     this.deepgramLive.addListener("error", (error) => {
-      console.error("deepgram error");
+      console.error("STT -> deepgram error");
       console.error(error);
     });
+
+    this.deepgramLive.addListener("warning", (warning) => {
+      console.error("STT -> deepgram warning");
+      console.error(warning);
+    });
+
+    this.deepgramLive.addListener("metadata", (metadata) => {
+      console.error("STT -> deepgram metadata");
+      console.error(metadata);
+    });
+    
     
     this.deepgramLive.addListener("close", () => {
-      console.log("Deepgram connection closed");
+      console.log("STT -> Deepgram connection closed");
     });
   }
 
