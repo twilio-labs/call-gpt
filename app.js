@@ -51,7 +51,7 @@ app.ws("/connection", (ws, req) => {
     } else if (msg.event === "mark") {
       const label = msg.mark.name;
       console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`)
-      marks = marks.filter(m => m === msg.mark.name)
+      marks = marks.filter(m => m !== msg.mark.name)
     } else if (msg.event === "stop") {
       console.log(`Media stream ${streamSid} ended.`)
     }
@@ -59,7 +59,7 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("utterance", async (text) => {
     // This is a bit of a hack to filter out empty utterances
-    if(marks.length > 0 && text?.length >= 2) {
+    if(marks.length > 0 && text?.length > 3) {
       console.log("Interruption, Clearing stream")
       ws.send(
         JSON.stringify({
@@ -68,7 +68,7 @@ app.ws("/connection", (ws, req) => {
         })
       );
     }
-  })
+  });
 
   transcriptionService.on("transcription", async (text) => {
     // console.time(`Interaction ${interactionCount}`)
@@ -80,14 +80,12 @@ app.ws("/connection", (ws, req) => {
   });
   
   gptService.on('gptreply', async (text, icount) => {
-    // console.timeLog(`Interaction ${interactionCount}`)
-    console.log(`Interaction ${icount}: Sending GPT reply to TTS service: ${text}` )
+    console.log(`Interaction ${icount}: GPT -> TTS: ${text}` )
     ttsService.generate(text, icount);
   });
 
   ttsService.on("speech", (audio, label, icount) => {
-    // console.timeLog(`Interaction ${interactionCount}`)
-    console.log(`Interaction ${icount}: Sending audio to Twilio ${audio.length} b64 characters: ${label}`);
+    console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`);
     ws.send(
       JSON.stringify({
         streamSid,
