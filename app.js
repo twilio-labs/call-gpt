@@ -1,11 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const ExpressWs = require("express-ws");
-const uuid = require('uuid');
 
-const { TextToSpeechService } = require("./services/tts-service");
-const { TranscriptionService } = require("./services/transcription-service");
 const { GptService } = require("./services/gpt-service");
+const { StreamService } = require("./services/stream-service");
+const { TranscriptionService } = require("./services/transcription-service");
+const { TextToSpeechService } = require("./services/tts-service");
 
 const app = express();
 ExpressWs(app);
@@ -17,7 +17,6 @@ app.post("/incoming", (req, res) => {
   res.type("text/xml");
   res.end(`
   <Response>
-    <Play>https://maize-earwig-4391.twil.io/assets/ElevenLabs_2023-12-01T06_57_02_Rachel_pre_s50_sb75_se0_b_m2.mp3</Play>
     <Connect>
       <Stream url="wss://${process.env.SERVER}/connection" />
     </Connect>
@@ -25,14 +24,13 @@ app.post("/incoming", (req, res) => {
   `);
 });
 
-
-
 app.ws("/connection", (ws, req) => {
   ws.on("error", console.error);
   // Filled in from start message
   let streamSid;
 
   const gptService = new GptService();
+  const streamService = new StreamService(ws);
   const transcriptionService = new TranscriptionService();
   const ttsService = new TextToSpeechService({});
   
@@ -44,8 +42,9 @@ app.ws("/connection", (ws, req) => {
     const msg = JSON.parse(data);
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
+      streamService.setStreamSid(streamSid);
       console.log(`Starting Media Stream for ${streamSid}`);
-      ttsService.generate("Hello! I understand you're looking for a pair of AirPods, is that correct?", 1);
+      ttsService.generate({partialResponseIndex: null, partialResponse: "Hello! I understand you're looking for a pair of AirPods, is that correct?"}, 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
@@ -77,35 +76,20 @@ app.ws("/connection", (ws, req) => {
     interactionCount += 1;
   });
   
-  gptService.on('gptreply', async (text, icount) => {
-    console.log(`Interaction ${icount}: GPT -> TTS: ${text}` )
-    ttsService.generate(text, icount);
+  gptService.on('gptreply', async (gptReply, icount) => {
+    console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}` )
+    ttsService.generate(gptReply, icount);
   });
 
-  ttsService.on("speech", (audio, label, icount) => {
+  ttsService.on("speech", (responseIndex, audio, label, icount) => {
     console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`);
-    ws.send(
-      JSON.stringify({
-        streamSid,
-        event: "media",
-        media: {
-          payload: audio,
-        },
-      })
-    );
-    // When the media completes you will receive a `mark` message with the label
-    const markLabel = uuid.v4()
-    ws.send(
-      JSON.stringify({
-        streamSid,
-        event: "mark",
-        mark: {
-          name: markLabel
-        }
-      })
-    )
-    marks.push(markLabel)
+
+    streamService.buffer(responseIndex, audio);
   });
+
+  streamService.on('audiosent', (markLabel) => {
+    marks.push(markLabel);
+  })
 });
 
 app.listen(PORT);
