@@ -30,12 +30,12 @@ class TranscriptionService extends EventEmitter {
           this.emit("transcription", this.finalResult);
           return;
         } else {
-          console.log("speech was already final when UtteranceEnd recevied");
+          // console.log("speech was already final when UtteranceEnd recevied");
           return;
         }
       }
 
-      console.log(text, "is_final: ", transcription?.is_final, "speech_final: ", transcription.speech_final);
+      // console.log(text, "is_final: ", transcription?.is_final, "speech_final: ", transcription.speech_final);
       // if is_final that means that this chunk of the transcription is accurate and we need to add it to the finalResult 
       if (transcription.is_final === true && text.trim().length > 0) {
         this.finalResult += ` ${text}`;

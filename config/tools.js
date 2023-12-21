@@ -79,7 +79,7 @@ const tools = [
         properties: {
           price: {
             type: "integer",
-            description: "The total price of the order"
+            description: "The total price of the order including tax"
           },
           orderNumber: {
             type: "integer",

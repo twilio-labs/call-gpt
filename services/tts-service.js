@@ -6,8 +6,6 @@ class TextToSpeechService extends EventEmitter {
     super();
     this.config = config;
     this.config.voiceId ||= process.env.VOICE_ID;
-    this.nextExpectedIndex = 0;
-    this.speechBuffer = {};
   }
 
   async generate(gptReply, interactionCount) {
