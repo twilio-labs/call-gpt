@@ -15,7 +15,8 @@ class TextToSpeechService extends EventEmitter {
 
     if (!partialResponse) { return; }
 
-    try {
+      try {
+          let startdt = new Date();
       const outputFormat = "ulaw_8000";
       const response = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${this.config.voiceId}/stream?output_format=${outputFormat}&optimize_streaming_latency=3`,
@@ -33,8 +34,9 @@ class TextToSpeechService extends EventEmitter {
           }),
         }
       );
-      const audioArrayBuffer = await response.arrayBuffer();
-      this.emit("speech", partialResponseIndex, Buffer.from(audioArrayBuffer).toString("base64"), partialResponse, interactionCount);
+          const audioArrayBuffer = await response.arrayBuffer();
+          let enddt = new Date();
+      this.emit("speech", partialResponseIndex, Buffer.from(audioArrayBuffer).toString("base64"), partialResponse, interactionCount, startdt, enddt);
     } catch (err) {
       console.error("Error occurred in TextToSpeech service");
       console.error(err);

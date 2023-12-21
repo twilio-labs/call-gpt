@@ -75,27 +75,30 @@ app.ws("/connection", (ws, req) => {
     }
   });
 
-  transcriptionService.on("transcription", async (text) => {
+  transcriptionService.on("transcription", async (text, startdt, enddt) => {
     if (!text) { return; }
       console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
       fbid = uuid.v4();
       type = 'phone'
+      await fbService.setLogs(text, fbid, conId, 'Deepgram', startdt, enddt);
       await fbService.setTranscript(text, fbid, conId, type);
     gptService.completion(text, interactionCount);
     interactionCount += 1;
   });
   
-  gptService.on('gptreply', async (gptReply, icount) => {
+  gptService.on('gptreply', async (gptReply, icount, startdt, enddt) => {
       console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}`)
       fbid = uuid.v4();
       type = 'bot'
+      await fbService.setLogs(gptReply.partialResponse, fbid, conId, 'OpenAI', startdt, enddt);
       await fbService.setTranscript(gptReply.partialResponse, fbid, conId, type);
     ttsService.generate(gptReply, icount);
   });
 
-  ttsService.on("speech", (responseIndex, audio, label, icount) => {
-    console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`);
-
+  ttsService.on("speech", (responseIndex, audio, label, icount, startdt, enddt) => {
+      console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`);
+      fbid = uuid.v4();
+      fbService.setLogs(label, fbid, conId, 'ElevenLabs', startdt, enddt);
     streamService.buffer(responseIndex, audio);
   });
 
@@ -115,7 +118,17 @@ app.get('/getAllTranscripts', async function (req, res) {
         let readfs = alltrans;
         res.json(readfs);
     }
-    //let response = "This is a test " + conId;
+   
+})
+
+app.get('/getAllLogs', async function (req, res) {
+    //res.send("this is a test" + conId);
+    let alllogs = await fbService.getAllLogs();
+    if (alllogs) {
+        let readfs = alllogs;
+        res.json(readfs);
+    }
+    
 
 })
 

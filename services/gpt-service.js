@@ -77,7 +77,7 @@ class GptService extends EventEmitter {
     let functionName = ""
     let functionArgs = ""
     let finishReason = ""
-
+    let startdt = new Date();
     for await (const chunk of stream) {
       let content = chunk.choices[0]?.delta?.content || ""
       let deltas = chunk.choices[0].delta
@@ -145,8 +145,8 @@ class GptService extends EventEmitter {
             partialResponseIndex: this.partialResponseIndex,
             partialResponse
           }
-
-          this.emit("gptreply", gptReply, interactionCount);
+          let enddt = new Date();
+          this.emit("gptreply", gptReply, interactionCount, startdt, enddt);
           this.partialResponseIndex++;
           partialResponse = ""
         }

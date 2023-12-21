@@ -18,7 +18,7 @@ class TranscriptionService extends EventEmitter {
 
     this.finalResult = "";
     this.speechFinal = false; // used to determine if we have seen speech_final=true indicating that deepgram detected a natural pause in the speakers speech. 
-
+      let startdt = new Date();
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
       const text = transcription.channel?.alternatives[0]?.transcript;
@@ -41,8 +41,10 @@ class TranscriptionService extends EventEmitter {
         this.finalResult += ` ${text}`;
         // if speech_final and is_final that means this text is accurate and it's a natural pause in the speakers speech. We need to send this to the assistant for processing
         if (transcription.speech_final === true) {
-          this.speechFinal = true; // this will prevent a utterance end which shows up after speechFinal from sending another response
-          this.emit("transcription", this.finalResult);
+            this.speechFinal = true; // this will prevent a utterance end which shows up after speechFinal from sending another response
+            let enddt = new Date();
+            this.emit("transcription", this.finalResult, startdt, enddt);
+            
           this.finalResult = "";
         } else {
           // if we receive a message without speechFinal reset speechFinal to false, this will allow any subsequent utteranceEnd messages to properly indicate the end of a message
@@ -68,7 +70,8 @@ class TranscriptionService extends EventEmitter {
       console.error(metadata);
     });
     
-    this.deepgramLive.addListener("close", () => {
+      this.deepgramLive.addListener("close", () => {
+      fbtranscriptcount = 0;
       console.log("STT -> Deepgram connection closed");
     });
   }
@@ -79,8 +82,7 @@ class TranscriptionService extends EventEmitter {
    */
   send(payload) {
     // TODO: Buffer up the media and then send
-      if (this.deepgramLive.getReadyState() === 1) {
-          fbtranscriptcount = 0;
+    if (this.deepgramLive.getReadyState() === 1) {
       this.deepgramLive.send(Buffer.from(payload, "base64"));
     }
   }

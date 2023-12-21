@@ -31,7 +31,7 @@ class FirebaseService extends EventEmitter {
         if (data) {
             //let ndate = Date();
             let dateObj = new Date(); 
-            let md = dateObj.toDateString() + " | " + dateObj.toTimeString();
+            let md = dateObj.toDateString() + " | " + dateObj.toTimeString() + " | " + conId;
             //check if record is saved
             //const record = await fb.database().ref(conId);
             // Attach an asynchronous callback to read the data at our posts reference
@@ -70,6 +70,57 @@ class FirebaseService extends EventEmitter {
         
     }
 
+    async setLogs(data, id, conId, type, startdt, enddt) {
+        if (data) {
+            //let ndate = Date();
+            let dateObj = new Date();
+            let md = dateObj.toDateString() + " | " + dateObj.toTimeString() + " | " + conId;
+            let latency = enddt - startdt;
+            let body = type + " | " + data + " | Latency: " + latency;
+            //check if record is saved
+            //const record = await fb.database().ref(conId);
+            // Attach an asynchronous callback to read the data at our posts reference
+            if (fbtranscriptcount > 1) {
+
+                var postListRef = fb.database().ref('logs/' + conId + '/log');
+                var newPostRef = postListRef.push();
+                newPostRef.set({
+                    id: id,
+                    body: body,
+                    datetime: fb.database.ServerValue.TIMESTAMP,
+                    type: type,
+                    start: startdt,
+                    end: enddt,
+                    latency: latency
+                });
+            } else {
+                const res = await fb.database().ref('logs/' + conId).set({
+                    conversationId: conId,
+                    //transcript: data,
+
+                    status: 'active',
+                    datetime: fb.database.ServerValue.TIMESTAMP,
+                    metadata: md,
+                    log: [
+                        {
+                            id: id,
+                            body: body,
+                            datetime: fb.database.ServerValue.TIMESTAMP,
+                            type: type,
+                            start: startdt,
+                            end: enddt,
+                            latency: latency
+                        }
+                    ]
+
+                });
+            }
+
+
+        }
+
+    }
+
     async getTranscriptById(id) {
         var transcript = fb.database().ref('transcripts/' + id);
         return transcript;
@@ -86,6 +137,18 @@ class FirebaseService extends EventEmitter {
             return snap;
         })
        
+    }
+
+    async getAllLogs() {
+        let snap;
+        //Get last ten records inserted by datetime 
+        var allLogs = await fb.database().ref('logs').orderByChild('datetime').limitToLast(10);
+        return await allLogs.once('value').then(function (snapshot) {
+            console.log(snapshot.val())
+            snap = snapshot.val();
+            return snap;
+        })
+
     }
 }
 
