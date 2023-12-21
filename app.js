@@ -1,18 +1,24 @@
 require("dotenv").config();
 const express = require("express");
 const ExpressWs = require("express-ws");
+const uuid = require('uuid');
 
 const { GptService } = require("./services/gpt-service");
 const { StreamService } = require("./services/stream-service");
 const { TranscriptionService } = require("./services/transcription-service");
 const { TextToSpeechService } = require("./services/tts-service");
+const { FirebaseService } = require("./services/fb-service");
 
 const app = express();
 ExpressWs(app);
-
+app.use(express.static('public'))
 const PORT = process.env.PORT || 3000;
-
+var fbid = '';
+var conId = '';
+var isUtterance = false; 
+const fbService = new FirebaseService();
 app.post("/incoming", (req, res) => {
+    conId = uuid.v4();
   res.status(200);
   res.type("text/xml");
   res.end(`
@@ -71,13 +77,19 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("transcription", async (text) => {
     if (!text) { return; }
-    console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
+      console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
+      fbid = uuid.v4();
+      type = 'phone'
+      await fbService.setTranscript(text, fbid, conId, type);
     gptService.completion(text, interactionCount);
     interactionCount += 1;
   });
   
   gptService.on('gptreply', async (gptReply, icount) => {
-    console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}` )
+      console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}`)
+      fbid = uuid.v4();
+      type = 'bot'
+      await fbService.setTranscript(gptReply.partialResponse, fbid, conId, type);
     ttsService.generate(gptReply, icount);
   });
 
@@ -91,6 +103,30 @@ app.ws("/connection", (ws, req) => {
     marks.push(markLabel);
   })
 });
+
+app.get('/getSessionId', function (req, res) {
+    res.json([{ id: conId }]);
+})
+
+app.get('/getAllTranscripts', async function (req, res) {
+    //res.send("this is a test" + conId);
+    let alltrans = await fbService.getAllTranscripts();
+    if (alltrans) {
+        let readfs = alltrans;
+        res.json(readfs);
+    }
+    //let response = "This is a test " + conId;
+
+})
+
+app.get('/getTranscriptById', async function (req, res) {
+    //res.send("this is a test" + conId);
+    //const response = "This is a test " + conId;
+    let response = fbService.getTranscriptById('11ee566c-880d-4708-8261-c95f947e0faf');
+
+    res.json(response);
+})
+
 
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);

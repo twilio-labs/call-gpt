@@ -79,7 +79,8 @@ class TranscriptionService extends EventEmitter {
    */
   send(payload) {
     // TODO: Buffer up the media and then send
-    if (this.deepgramLive.getReadyState() === 1) {
+      if (this.deepgramLive.getReadyState() === 1) {
+          fbtranscriptcount = 0;
       this.deepgramLive.send(Buffer.from(payload, "base64"));
     }
   }
