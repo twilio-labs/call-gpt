@@ -50,7 +50,7 @@ function processReponse(data, type) {
         const arr = Object.entries(data);
         
         for (let i = 0; i < arr.length; i++) { 
-            let conId = arr[i][1].conversationId;
+            let conId = arr[i][1].metadata;
             conlist = '<div class="accordion-item"><h2 class="accordion-header" id="heading' + i + '"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + i + '" aria-expanded="false" aria-controls="collapseTwo">' + conId + ' </button> </h2><div id="collapse' + i + '" class="accordion-collapse collapse" aria-labelledby="heading' + i +'" data-bs-parent="#accordionExample"> <div id="msgbody-' + i + '" class="accordion-body"></div></div></div>'
             document.getElementById('history').innerHTML += conlist;
             const arr2 = Object.entries(arr[i][1].transcript);
@@ -58,8 +58,14 @@ function processReponse(data, type) {
             //let lng = arr2.length;
             //conlist += arr[i][1].conversationId + "<br>";
             for (let x = 0; x < arr2.length; x++) {
+                let type = arr2[x][1].type;
+                if (type === 'phone') {
+                    type = 'human'
+                    msgbody += '<span class="badge rounded-pill bg-dark">' + type + '</span><span> ' + arr2[x][1].body + '</span></br>';
+                } else {
+                    msgbody += '<span class="badge rounded-pill bg-primary">' + type + '</span><span> ' + arr2[x][1].body + '</span></br>';
+                }
                 
-                msgbody += arr2[x][1].body;
             }
             
             document.getElementById('msgbody-' + i).innerHTML = msgbody;

@@ -30,12 +30,13 @@ class FirebaseService extends EventEmitter {
         fbtranscriptcount++;
         if (data) {
             //let ndate = Date();
-            let md = 'Can set any metadata here, this is a count ' + fbtranscriptcount;
+            let dateObj = new Date(); 
+            let md = dateObj.toDateString() + " | " + dateObj.toTimeString();
             //check if record is saved
             //const record = await fb.database().ref(conId);
             // Attach an asynchronous callback to read the data at our posts reference
             if (fbtranscriptcount > 1) {
-
+                
                 var postListRef = fb.database().ref('transcripts/' + conId + '/transcript');
                 var newPostRef = postListRef.push();
                 newPostRef.set({
@@ -64,32 +65,27 @@ class FirebaseService extends EventEmitter {
                 });
             }
 
-
+         
         }
-
+        
     }
 
     async getTranscriptById(id) {
         var transcript = fb.database().ref('transcripts/' + id);
         return transcript;
-
+      
     }
 
     async getAllTranscripts() {
         let snap;
-        var allTranscripts = await fb.database().ref('transcripts');
+        //Get last ten records inserted by datetime 
+        var allTranscripts = await fb.database().ref('transcripts').orderByChild('datetime').limitToLast(10);
         return await allTranscripts.once('value').then(function (snapshot) {
             console.log(snapshot.val())
             snap = snapshot.val();
             return snap;
         })
-        //await allTranscripts.on('value', (snapshot) => {
-        //    console.log(snapshot.val());
-
-        //}, (errorObject) => {
-        //    console.log('The read failed: ' + errorObject.name);
-        //}); 
-
+       
     }
 }
 
