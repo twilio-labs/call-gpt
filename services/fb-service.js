@@ -16,38 +16,66 @@ const firebaseConfig = {
   measurementId: 'G-KLLK96FJCB',
 };
 
-// Initialize Firebase
 fb.initializeApp(firebaseConfig);
 
+<<<<<<< HEAD
 let fbtranscriptcount = 0;
 class FirebaseService extends EventEmitter {
   static async setTranscript(data, id, conId, type) {
     try {
       fbtranscriptcount += 1;
+=======
+class FirebaseService extends EventEmitter {
+  constructor() {
+    super();
+
+    this.fbtranscriptcount = 0;
+  }
+
+  async setTranscript(data, id, conId, type) {
+    try {
+      this.fbtranscriptcount += 1;
+>>>>>>> 79f9e95 (Lint all services files)
       if (data) {
         // let ndate = Date();
         const dateObj = new Date();
         const md = `${dateObj.toDateString()} | ${dateObj.toTimeString()} | ${conId}`;
+<<<<<<< HEAD
         if (fbtranscriptcount > 1) {
+=======
+        if (this.fbtranscriptcount > 1) {
+>>>>>>> 79f9e95 (Lint all services files)
           const postListRef = fb.database().ref(`transcripts/${conId}/transcript`);
           const newPostRef = postListRef.push();
           newPostRef.set({
             id,
             body: data,
+<<<<<<< HEAD
             datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+            datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
             type,
           });
         } else {
           await fb.database().ref(`transcripts/${conId}`).set({
             conversationId: conId,
             status: 'active',
+<<<<<<< HEAD
             datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+            datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
             metadata: md,
             transcript: [
               {
                 id,
                 body: data,
+<<<<<<< HEAD
                 datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+                datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
                 type,
               },
             ],
@@ -60,7 +88,11 @@ class FirebaseService extends EventEmitter {
     }
   }
 
+<<<<<<< HEAD
   static async setLogs(data, id, conId, type, startdt, enddt) {
+=======
+  async setLogs(data, id, conId, type, startdt, enddt) {
+>>>>>>> 79f9e95 (Lint all services files)
     try {
       if (data) {
         const dateObj = new Date();
@@ -68,13 +100,21 @@ class FirebaseService extends EventEmitter {
         const latency = enddt - startdt;
         const body = `${type} | ${data} | Latency: ${latency}`;
 
+<<<<<<< HEAD
         if (fbtranscriptcount > 1) {
+=======
+        if (this.fbtranscriptcount > 1) {
+>>>>>>> 79f9e95 (Lint all services files)
           const postListRef = fb.database().ref(`logs/${conId}/log`);
           const newPostRef = postListRef.push();
           newPostRef.set({
             id,
             body,
+<<<<<<< HEAD
             datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+            datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
             type,
             start: startdt,
             end: enddt,
@@ -84,13 +124,21 @@ class FirebaseService extends EventEmitter {
           await fb.database().ref(`logs/${conId}`).set({
             conversationId: conId,
             status: 'active',
+<<<<<<< HEAD
             datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+            datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
             metadata: md,
             log: [
               {
                 id,
                 body,
+<<<<<<< HEAD
                 datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+                datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
                 type,
                 start: startdt,
                 end: enddt,
@@ -107,7 +155,11 @@ class FirebaseService extends EventEmitter {
     }
   }
 
+<<<<<<< HEAD
   static async setErrors(error, conId, data) {
+=======
+  async setErrors(error, conId, data) {
+>>>>>>> 79f9e95 (Lint all services files)
     try {
       if (error) {
         // let ndate = Date();
@@ -117,7 +169,11 @@ class FirebaseService extends EventEmitter {
         await fb.database().ref(`logs/${conId}`).set({
           conversationId: conId,
           status: 'error',
+<<<<<<< HEAD
           datetime: fb.database.ServerValue.TIMESTAMP,
+=======
+          datetime: Date.now(),
+>>>>>>> 79f9e95 (Lint all services files)
           metadata: md,
           message: msg,
           stacktrace: data,
@@ -130,13 +186,21 @@ class FirebaseService extends EventEmitter {
     }
   }
 
+<<<<<<< HEAD
   static async getTranscriptById(id) {
+=======
+  async getTranscriptById(id) {
+>>>>>>> 79f9e95 (Lint all services files)
     const transcript = fb.database().ref(`transcripts/${id}`);
     return transcript;
   }
 
   // eslint-disable-next-line consistent-return
+<<<<<<< HEAD
   static async getAllTranscripts() {
+=======
+  async getAllTranscripts() {
+>>>>>>> 79f9e95 (Lint all services files)
     try {
       let snap;
       // Get last ten records inserted by datetime
@@ -153,7 +217,11 @@ class FirebaseService extends EventEmitter {
   }
 
   // eslint-disable-next-line consistent-return
+<<<<<<< HEAD
   static async getAllLogs() {
+=======
+  async getAllLogs() {
+>>>>>>> 79f9e95 (Lint all services files)
     try {
       let snap;
       // Get last ten records inserted by datetime
