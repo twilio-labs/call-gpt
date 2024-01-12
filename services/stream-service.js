@@ -22,11 +22,7 @@ class StreamService extends EventEmitter {
       this.sendAudio(audio);
       this.expectedAudioIndex += 1;
 
-<<<<<<< HEAD
-      while (this.audioBuffer.hasOwnProperty(this.expectedAudioIndex)) {
-=======
       while (Object.prototype.hasOwnProperty.call(this.audioBuffer, this.expectedAudioIndex)) {
->>>>>>> 79f9e95 (Lint all services files)
         const bufferedAudio = this.audioBuffer[this.expectedAudioIndex];
         this.sendAudio(bufferedAudio);
         this.expectedAudioIndex += 1;
@@ -37,29 +33,6 @@ class StreamService extends EventEmitter {
   }
 
   sendAudio(audio) {
-<<<<<<< HEAD
-    this.ws.send(
-      JSON.stringify({
-        streamSid: this.streamSid,
-        event: 'media',
-        media: {
-          payload: audio,
-        },
-      }),
-    );
-    // When the media completes you will receive a `mark` message with the label
-    const markLabel = uuid.v4();
-    this.ws.send(
-      JSON.stringify({
-        streamSid: this.streamSid,
-        event: 'mark',
-        mark: {
-          name: markLabel,
-        },
-      }),
-    );
-    this.emit('audiosent', markLabel);
-=======
     try {
       this.ws.send(
         JSON.stringify({
@@ -85,7 +58,6 @@ class StreamService extends EventEmitter {
     } catch (error) {
       console.log(error);
     }
->>>>>>> 79f9e95 (Lint all services files)
   }
 }
 

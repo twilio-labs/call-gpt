@@ -26,7 +26,12 @@ class TranscriptionService extends EventEmitter {
     const startdt = new Date();
     this.deepgramLive.addListener('transcriptReceived', (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
-      const text = transcription.channel?.alternatives[0]?.transcript;
+      const alternatives = transcription.channel?.alternatives;
+
+      let text = '';
+      if (alternatives) {
+        text = alternatives[0]?.transcript;
+      }
 
       /*
       If we receive an UtteranceEnd and speech_final
