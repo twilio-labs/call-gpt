@@ -16,7 +16,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
-	"firebase": "^10.7.1",
+    "firebase": "^10.7.1",
     "firebase-admin": "^12.0.0",
     "node-fetch": "^2.7.0",
     "openai": "^4.20.1",
@@ -26,6 +26,9 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.4.11",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
     "nodemon": "^3.0.2"
   }
 }
