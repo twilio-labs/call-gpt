@@ -142,6 +142,3 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
-
-# Firebase Service Account Configuration
-firebase-db.json
