@@ -5,6 +5,7 @@ Generative AI is producing a bunch of fun new models for us devs to poke at. Did
 Twilio gives you a superpower called [Media Streams](https://twilio.com/media-streams). Media Streams provides a Websocket connection to both sides of a phone call. You can get audio streamed to you, process it, and send audio back.
 
 This repo serves as a demo exploring three models:
+
 - [Deepgram](https://deepgram.com/) for Speech to Text
 - [elevenlabs](https://elevenlabs.io) for Text to Speech
 - [OpenAI](https://openai.com) for GPT prompt completion
@@ -12,11 +13,13 @@ This repo serves as a demo exploring three models:
 These service combine to create a voice application that is remarkably better at transcribing, understanding, and speaking than traditional IVR systems.
 
 Features:
+
 - Returns responses with low latency, typically 1 second by utilizing streaming.
 - Allows the user to interrupt the GPT assistant and ask a different question.
 - Maintains chat history with GPT.
 
 ## Setting up for Development
+
 Sign up for Deepgram, ElevenLabs, and OpenAI. You'll need an API key for each service.
 
 Use [ngrok](https://ngrok.com) to tunnel and then expose port `3000`
@@ -28,6 +31,13 @@ ngrok http 3000
 Copy `.env.example` to `.env` and add all API keys.
 
 Set `SERVER` to your tunneled ngrok URL
+
+Generate Firebase private key:
+
+- Visit the Firebase Console and create a new project.
+- Navigate to the "Service accounts" section in your Firebase project settings.
+- Click on "Generate new private key" and download the JSON file.
+- Save this JSON file in the root of your project and name it firebase-db.json.
 
 Install the necessary packages:
 
@@ -50,14 +60,17 @@ twilio phone-numbers:update +1[your-twilio-number] --voice-url=https://your-serv
 There is a [Stream](https://www.twilio.com/docs/voice/twiml/stream) TwiML verb that will connect a stream to your websocket server.
 
 ## Deploy via Fly.io
+
 Fly.io is a hosting service similar to Heroku that simplifies the deployment process. Given Twilio Media Streams are sent and received from us-east-1, it's recommended to choose Fly's Ashburn, VA (IAD) region.
 
 Deploy the app using the Fly.io CLI:
+
 ```bash
 fly deploy
 ```
 
 Import your secrets from your .env file to your deployed app:
+
 ```bash
 fly secrets import < .env
 ```
