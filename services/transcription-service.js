@@ -21,7 +21,11 @@ class TranscriptionService extends EventEmitter {
 
     this.deepgramLive.addListener("transcriptReceived", (transcriptionMessage) => {
       const transcription = JSON.parse(transcriptionMessage);
-      const text = transcription.channel?.alternatives[0]?.transcript;
+      const alternatives = transcription.channel?.alternatives;
+      let text = '';
+      if (alternatives) {
+        text = alternatives[0]?.transcript
+      }
       
       // if we receive an UtteranceEnd and speech_final has not already happened then we should consider this the end of of the human speech and emit the transcription
       if (transcription.type === "UtteranceEnd") {
@@ -35,7 +39,7 @@ class TranscriptionService extends EventEmitter {
         }
       }
 
-      console.log(text, "is_final: ", transcription?.is_final, "speech_final: ", transcription.speech_final);
+      // console.log(text, "is_final: ", transcription?.is_final, "speech_final: ", transcription.speech_final);
       // if is_final that means that this chunk of the transcription is accurate and we need to add it to the finalResult 
       if (transcription.is_final === true && text.trim().length > 0) {
         this.finalResult += ` ${text}`;
