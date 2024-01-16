@@ -3,7 +3,7 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "check_inventory",
+      name: "checkInventory",
       description: "Check the inventory of airpods, airpods pro or airpods max.",
       parameters: {
         type: "object",
@@ -30,7 +30,7 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "check_price",
+      name: "checkPrice",
       description: "Check the price of given model of airpods, airpods pro or airpods max.",
       parameters: {
         type: "object",
@@ -57,7 +57,7 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "place_order",
+      name: "placeOrder",
       description: "Places an order for a set of airpods.",
       parameters: {
         type: "object",
