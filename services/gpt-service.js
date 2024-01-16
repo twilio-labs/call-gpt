@@ -1,43 +1,14 @@
 const EventEmitter = require("events");
 const OpenAI = require('openai');
-const tools = require('../config/tools');
+const tools = require('../functions/function-manifest');
 
-function check_inventory(model) {
-  console.log("GPT -> called check_inventory");
-  if (model?.toLowerCase().includes("pro")) {
-    return JSON.stringify({ stock: 10 });
-  } else if (model?.toLowerCase().includes("max")) {
-    return JSON.stringify({ stock: 0 });
-  } else {
-    return JSON.stringify({ stock: 100 });
-  }
-}
-
-function check_price(model) {
-  console.log("GPT -> called check_price");
-  if (model?.toLowerCase().includes("pro")) {
-    return JSON.stringify({ price: 249 });
-  } else if (model?.toLowerCase().includes("max")) {
-    return JSON.stringify({ price: 549 });
-  } else {
-    return JSON.stringify({ price: 149 });
-  }
-}
-
-function place_order(model, quantity) {
-  console.log("GPT -> called place_order");
-  
-  // generate a random order number that is 7 digits 
-  orderNum = Math.floor(Math.random() * (9999999 - 1000000 + 1) + 1000000);
-
-  // check model and return the order number and price with 7.9% sales tax
-  if (model?.toLowerCase().includes("pro")) {
-    return JSON.stringify({ orderNumber: orderNum, price: Math.floor(quantity * 249 * 1.79)});
-  } else if (model?.toLowerCase().includes("max")) {
-    return JSON.stringify({ orderNumber: orderNum, price: Math.floor(quantity * 549 * 1.79) });
-  }
-  return JSON.stringify({ orderNumber: orderNum, price: Math.floor(quantity * 179 * 1.79) });
-}
+// Import all functions included in function manifest
+// Note: the function name and file name must be the same
+const availableFunctions = {}
+tools.forEach((tool) => {
+  functionName = tool.function.name;
+  availableFunctions[functionName] = require(`../functions/${functionName}`);
+});
 
 class GptService extends EventEmitter {
   constructor() {
@@ -56,12 +27,6 @@ class GptService extends EventEmitter {
     } else {
       this.userContext.push({ "role": role, "content": text })
     }
-
-    const availableFunctions = {
-      check_inventory: check_inventory,
-      check_price: check_price,
-      place_order: place_order,
-    };
 
     // Step 1: Send user transcription to Chat GPT
     const stream = await this.openai.chat.completions.create({
@@ -111,18 +76,7 @@ class GptService extends EventEmitter {
         }
 
         const functionToCall = availableFunctions[functionName];
-        let functionResponse = null;
-        // execute the correct function with the correct arguments
-        if (functionName === 'check_inventory' || functionName === 'check_price') {
-          functionResponse = functionToCall(
-            functionArgs.model
-          );
-        } else if (functionName === 'place_order') {
-          functionResponse = functionToCall(
-            functionArgs.model,
-            functionArgs.quantity
-          )
-        }
+        let functionResponse = functionToCall(functionArgs);
 
         // Step 4: send the info on the function call and function response to GPT
         this.userContext.push({
