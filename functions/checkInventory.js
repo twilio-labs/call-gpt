@@ -1,6 +1,6 @@
 function checkInventory(functionArgs) {
   const model = functionArgs.model;
-  console.log("GPT -> called checkInventory");
+  console.log("GPT -> called checkInventory function");
   
   if (model?.toLowerCase().includes("pro")) {
     return JSON.stringify({ stock: 10 });

@@ -1,4 +1,5 @@
 const EventEmitter = require("events");
+const colors = require('colors');
 const OpenAI = require('openai');
 const tools = require('../functions/function-manifest');
 
@@ -107,8 +108,7 @@ class GptService extends EventEmitter {
       }
     }
     this.userContext.push({"role": "assistant", "content": completeResponse})
-    console.log(`User context length: ${this.userContext.length}`)
-    // console.log(this.userContext);
+    console.log(`GPT -> user context length: ${this.userContext.length}`.green)
   }
 }
 

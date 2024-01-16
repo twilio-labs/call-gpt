@@ -1,6 +1,6 @@
 function placeOrder(functionArgs) {
   const {model, quantity} = functionArgs;
-  console.log("GPT -> called placeOrder");
+  console.log("GPT -> called placeOrder function");
   
   // generate a random order number that is 7 digits 
   orderNum = Math.floor(Math.random() * (9999999 - 1000000 + 1) + 1000000);

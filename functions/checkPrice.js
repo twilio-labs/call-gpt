@@ -1,6 +1,6 @@
 function checkPrice(functionArgs) {
   let model = functionArgs.model;
-  console.log("GPT -> called checkPrice");
+  console.log("GPT -> called checkPrice function");
   if (model?.toLowerCase().includes("pro")) {
     return JSON.stringify({ price: 249 });
   } else if (model?.toLowerCase().includes("max")) {

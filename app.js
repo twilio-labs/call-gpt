@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const ExpressWs = require("express-ws");
+const colors = require('colors');
+
 
 const { GptService } = require("./services/gpt-service");
 const { StreamService } = require("./services/stream-service");
@@ -43,23 +45,23 @@ app.ws("/connection", (ws, req) => {
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       streamService.setStreamSid(streamSid);
-      console.log(`Starting Media Stream for ${streamSid}`);
+      console.log(`Starting Media Stream for ${streamSid}`.underline.red);
       ttsService.generate({partialResponseIndex: null, partialResponse: "Hello! I understand you're looking for a pair of AirPods, is that correct?"}, 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
       const label = msg.mark.name;
-      console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`)
+      console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`.red)
       marks = marks.filter(m => m !== msg.mark.name)
     } else if (msg.event === "stop") {
-      console.log(`Media stream ${streamSid} ended.`)
+      console.log(`Media stream ${streamSid} ended.`.underline.red)
     }
   });
 
   transcriptionService.on("utterance", async (text) => {
     // This is a bit of a hack to filter out empty utterances
     if(marks.length > 0 && text?.length > 5) {
-      console.log("Interruption, Clearing stream")
+      console.log("Interruption, Clearing stream".red)
       ws.send(
         JSON.stringify({
           streamSid,
@@ -71,18 +73,18 @@ app.ws("/connection", (ws, req) => {
 
   transcriptionService.on("transcription", async (text) => {
     if (!text) { return; }
-    console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`);
+    console.log(`Interaction ${interactionCount} – STT -> GPT: ${text}`.yellow);
     gptService.completion(text, interactionCount);
     interactionCount += 1;
   });
   
   gptService.on('gptreply', async (gptReply, icount) => {
-    console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}` )
+    console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}`.green )
     ttsService.generate(gptReply, icount);
   });
 
   ttsService.on("speech", (responseIndex, audio, label, icount) => {
-    console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`);
+    console.log(`Interaction ${icount}: TTS -> TWILIO: ${label}`.blue);
 
     streamService.buffer(responseIndex, audio);
   });
