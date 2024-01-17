@@ -77,7 +77,7 @@ class GptService extends EventEmitter {
         }
 
         const functionToCall = availableFunctions[functionName];
-        let functionResponse = functionToCall(functionArgs);
+        let functionResponse = await functionToCall(functionArgs);
 
         // Step 4: send the info on the function call and function response to GPT
         this.userContext.push({
