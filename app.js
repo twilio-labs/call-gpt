@@ -45,23 +45,23 @@ app.ws("/connection", (ws, req) => {
     if (msg.event === "start") {
       streamSid = msg.start.streamSid;
       streamService.setStreamSid(streamSid);
-      console.log(`Starting Media Stream for ${streamSid}`.underline.red);
+      console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
       ttsService.generate({partialResponseIndex: null, partialResponse: "Hello! I understand you're looking for a pair of AirPods, is that correct?"}, 1);
     } else if (msg.event === "media") {
       transcriptionService.send(msg.media.payload);
     } else if (msg.event === "mark") {
       const label = msg.mark.name;
-      console.log(`Media completed mark (${msg.sequenceNumber}): ${label}`.red)
+      console.log(`Twilio -> Audio completed mark (${msg.sequenceNumber}): ${label}`.red)
       marks = marks.filter(m => m !== msg.mark.name)
     } else if (msg.event === "stop") {
-      console.log(`Media stream ${streamSid} ended.`.underline.red)
+      console.log(`Twilio -> Media stream ${streamSid} ended.`.underline.red)
     }
   });
 
   transcriptionService.on("utterance", async (text) => {
     // This is a bit of a hack to filter out empty utterances
     if(marks.length > 0 && text?.length > 5) {
-      console.log("Interruption, Clearing stream".red)
+      console.log("Twilio -> Interruption, Clearing stream".red)
       ws.send(
         JSON.stringify({
           streamSid,

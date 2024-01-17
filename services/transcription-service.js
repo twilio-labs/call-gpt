@@ -34,7 +34,7 @@ class TranscriptionService extends EventEmitter {
           this.emit("transcription", this.finalResult);
           return;
         } else {
-          console.log("speech was already final when UtteranceEnd recevied".yellow);
+          console.log("STT -> Speech was already final when UtteranceEnd recevied".yellow);
           return;
         }
       }
