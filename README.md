@@ -242,6 +242,11 @@ The `scripts` directory contains two files that allow you to place test calls:
 - `npm run inbound` will place an automated call from a Twilio number to your app and speak a script. You can adjust this to your use-case, e.g. as an automated test.
 - `npm run outbound` will place an outbound call that connects to your app. This can be useful if you want the app to call your phone so that you can manually test it.
 
+## Testing with Jest
+Repeatedly calling the app can be a time consuming way to test your tool function calls. This project contains example unit tests that can help you test your functions without relying on the GPT to call them.
+
+Simple example tests are available in the `/test` directory. To run them, simply run `npm run test`.
+
 ## Deploy via Fly.io
 Fly.io is a hosting service similar to Heroku that simplifies the deployment process. Given Twilio Media Streams are sent and received from us-east-1, it's recommended to choose Fly's Ashburn, VA (IAD) region.
 
