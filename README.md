@@ -232,6 +232,15 @@ For our `placeOrder` function, the arguments passed will look like this:
   quantity: 10
 }
 ```
+### Returning Arguments to GPT
+Your function should always return a value: GPT tends to get confused when the function returns nothing, and may continue trying to call the function expecting an answer. If your function doesn't have any data to return to the GPT, you should still consider returning a response that says something like "The function to do (X) ran successfully."
+
+Any data that you return to the GPT should match the expected format listed in the `returns` key of `function-manifest.js`.
+
+## Utility Scripts for Placing Calls
+The `scripts` directory contains two files that allow you to place test calls:
+- `npm run inbound` will place an automated call from a Twilio number to your app and speak a script. You can adjust this to your use-case, e.g. as an automated test.
+- `npm run outbound` will place an outbound call that connects to your app. This can be useful if you want the app to call your phone so that you can manually test it.
 
 ## Deploy via Fly.io
 Fly.io is a hosting service similar to Heroku that simplifies the deployment process. Given Twilio Media Streams are sent and received from us-east-1, it's recommended to choose Fly's Ashburn, VA (IAD) region.

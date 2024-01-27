@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/test-call.js",
+    "inbound": "node ./scripts/inbound-call.js",
+    "outbound": "node ./scripts/outbound-call.js",
     "dev": "nodemon app.js",
     "start": "node app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Charlie Weems",
   "license": "MIT",
   "dependencies": {
     "@deepgram/sdk": "^2.4.0",
