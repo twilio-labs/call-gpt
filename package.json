@@ -6,6 +6,7 @@
   "scripts": {
     "inbound": "node ./scripts/inbound-call.js",
     "outbound": "node ./scripts/outbound-call.js",
+    "test": "jest",
     "dev": "nodemon app.js",
     "start": "node app.js"
   },
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.4.11",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.2"
   }
 }
