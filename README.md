@@ -47,9 +47,9 @@ Copy `.env.example` to `.env` and configure the following environment variables:
 SERVER="yourserverdomain.com"
 
 # Service API Keys
-OPENAI_API_KEY="sk-XXXXXX"
-DEEPGRAM_API_KEY="YOUR-DEEPGRAM-API-KEY"
-XI_API_KEY="YOUR-ELEVEN-LABS-API-KEY"
+OPENAI_API_KEY="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"
+DEEPGRAM_API_KEY="537c7613e8b0fda84bda1024a96546687eb9c4c7"
+XI_API_KEY="6e4f365b7d1dc8dc316653a0915f99ec"
 # Available models at a signed GET request to /v1/models
 XI_MODEL_ID="eleven_turbo_v2"
 
