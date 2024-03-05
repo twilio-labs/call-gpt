@@ -30,6 +30,7 @@ app.ws('/connection', (ws) => {
   ws.on('error', console.error);
   // Filled in from start message
   let streamSid;
+  let callSid;
 
   const gptService = new GptService();
   const streamService = new StreamService(ws);
@@ -44,7 +45,9 @@ app.ws('/connection', (ws) => {
     const msg = JSON.parse(data);
     if (msg.event === 'start') {
       streamSid = msg.start.streamSid;
+      callSid = msg.start.callSid;
       streamService.setStreamSid(streamSid);
+      gptService.setCallSid(callSid);
       console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
       ttsService.generate({partialResponseIndex: null, partialResponse: 'Hello! I understand you\'re looking for a pair of AirPods, is that correct?'}, 1);
     } else if (msg.event === 'media') {

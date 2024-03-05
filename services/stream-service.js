@@ -8,6 +8,7 @@ class StreamService extends EventEmitter {
     this.expectedAudioIndex = 0;
     this.audioBuffer = {};
     this.streamSid = '';
+    this.callSid = '';
   }
 
   setStreamSid (streamSid) {

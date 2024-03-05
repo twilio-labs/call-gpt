@@ -142,6 +142,6 @@ dist
 .svelte-kit
 
 # Ignore Fly.io configuration file
-.toml
+fly.toml
 
 # End of https://www.toptal.com/developers/gitignore/api/node

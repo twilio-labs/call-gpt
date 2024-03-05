@@ -1,4 +1,4 @@
-function placeOrder(functionArgs) {
+async function placeOrder(functionArgs) {
   const {model, quantity} = functionArgs;
   console.log('GPT -> called placeOrder function');
   

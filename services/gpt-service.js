@@ -22,6 +22,12 @@ class GptService extends EventEmitter {
     this.partialResponseIndex = 0;
   }
 
+  // Add the callSid to the chat context in case
+  // ChatGPT decides to transfer the call.
+  setCallSid (callSid) {
+    this.userContext.push({ 'role': 'system', 'content': `callSid: ${callSid}` });
+  }
+
   async completion(text, interactionCount, role = 'user', name = 'user') {
     if (name != 'user') {
       this.userContext.push({ 'role': role, 'name': name, 'content': text });
@@ -77,7 +83,7 @@ class GptService extends EventEmitter {
         }
 
         const functionToCall = availableFunctions[functionName];
-        let functionResponse = functionToCall(functionArgs);
+        let functionResponse = await functionToCall(functionArgs);
 
         // Step 4: send the info on the function call and function response to GPT
         this.userContext.push({
@@ -86,7 +92,7 @@ class GptService extends EventEmitter {
           content: functionResponse,
         });
         // extend conversation with function response
-
+        console.log(this.userContext);
         // call the completion function again but pass in the function response to have OpenAI generate a new assistant response
         await this.completion(functionResponse, interactionCount, 'function', functionName);
       } else {

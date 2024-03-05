@@ -1,4 +1,4 @@
-function checkPrice(functionArgs) {
+async function checkPrice(functionArgs) {
   let model = functionArgs.model;
   console.log('GPT -> called checkPrice function');
   if (model?.toLowerCase().includes('pro')) {

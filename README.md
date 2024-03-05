@@ -233,7 +233,7 @@ For our `placeOrder` function, the arguments passed will look like this:
 }
 ```
 ### Returning Arguments to GPT
-Your function should always return a value: GPT tends to get confused when the function returns nothing, and may continue trying to call the function expecting an answer. If your function doesn't have any data to return to the GPT, you should still consider returning a response that says something like "The function to do (X) ran successfully."
+Your function should always return a value: GPT will get confused when the function returns nothing, and may continue trying to call the function expecting an answer. If your function doesn't have any data to return to the GPT, you should still return a response with an instruction like "Tell the user that their request was processed successfully." This prevents the GPT from calling the function repeatedly and wasting tokens. 
 
 Any data that you return to the GPT should match the expected format listed in the `returns` key of `function-manifest.js`.
 
