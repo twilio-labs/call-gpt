@@ -3,7 +3,6 @@ require('colors');
 const express = require('express');
 const ExpressWs = require('express-ws');
 
-
 const { GptService } = require('./services/gpt-service');
 const { StreamService } = require('./services/stream-service');
 const { TranscriptionService } = require('./services/transcription-service');

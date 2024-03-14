@@ -4,6 +4,7 @@ const tools = [
     type: 'function',
     function: {
       name: 'checkInventory',
+      say: 'Let me check our inventory right now.',
       description: 'Check the inventory of airpods, airpods pro or airpods max.',
       parameters: {
         type: 'object',
@@ -31,6 +32,7 @@ const tools = [
     type: 'function',
     function: {
       name: 'checkPrice',
+      say: 'Let me check the price, one moment.',
       description: 'Check the price of given model of airpods, airpods pro or airpods max.',
       parameters: {
         type: 'object',
@@ -58,6 +60,7 @@ const tools = [
     type: 'function',
     function: {
       name: 'placeOrder',
+      say: 'All right, I\'m just going to ring that up in our system.',
       description: 'Places an order for a set of airpods.',
       parameters: {
         type: 'object',
@@ -93,6 +96,7 @@ const tools = [
     type: 'function',
     function: {
       name: 'transferCall',
+      say: 'One moment while I transfer your call.',
       description: 'Transfers the customer to a live agent in case they request help from a real person.',
       parameters: {
         type: 'object',

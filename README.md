@@ -189,6 +189,7 @@ Example function manifest entry:
   type: "function",
   function: {
     name: "checkInventory",
+    say: "Let me check our inventory right now.",
     description: "Check the inventory of airpods, airpods pro or airpods max.",
     parameters: {
       type: "object",
@@ -213,6 +214,8 @@ Example function manifest entry:
   },
 }
 ```
+#### Using `say` in the Function Manifest
+The `say` key in the function manifest allows you to define a sentence for the app to speak to the user before calling a function. For example, if a function will take a long time to call you might say "Give me a few moments to look that up for you..."
 
 ### Receiving Function Arguments
 When ChatGPT calls a function, it will provide an object with multiple attributes as a single argument. The parameters included in the object are based on the definition in your `function-manifest.js` file.
