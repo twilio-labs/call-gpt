@@ -108,7 +108,7 @@ class GptService extends EventEmitter {
         let functionResponse = await functionToCall(validatedArgs);
 
         // Step 4: send the info on the function call and function response to GPT
-        this.updateUserContext('function', functionName, functionResponse);
+        this.updateUserContext(functionName, 'function', functionResponse);
         
         // call the completion function again but pass in the function response to have OpenAI generate a new assistant response
         await this.completion(functionResponse, interactionCount, 'function', functionName);
