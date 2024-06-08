@@ -4,9 +4,8 @@ Wouldn't it be neat if you could build an app that allowed you to chat with Chat
 
 Twilio gives you a superpower called [Media Streams](https://twilio.com/media-streams). Media Streams provides a Websocket connection to both sides of a phone call. You can get audio streamed to you, process it, and send audio back.
 
-This app serves as a demo exploring three services:
-- [Deepgram](https://deepgram.com/) for Speech to Text
-- [elevenlabs](https://elevenlabs.io) for Text to Speech
+This app serves as a demo exploring two services:
+- [Deepgram](https://deepgram.com/) for Speech to Text and Text to Speech
 - [OpenAI](https://openai.com) for GPT prompt completion
 
 These service combine to create a voice application that is remarkably better at transcribing, understanding, and speaking than traditional IVR systems.
@@ -23,12 +22,8 @@ Features:
 Sign up for the following services and get an API key for each:
 - [Deepgram](https://console.deepgram.com/signup)
 - [OpenAI](https://platform.openai.com/signup)
-- [ElevenLabs](https://elevenlabs.io/sign-up)
-
-With ElevenLabs, you'll have the option of using an existing voice or creating a new one. The app is configured to use the "Rachel" voice by default, but you can find a list of all available voice IDs [here](https://api.elevenlabs.io/v1/voices).
 
 If you're hosting the app locally, we also recommend using a tunneling service like [ngrok](https://ngrok.com) so that Twilio can forward audio to your app.
-
 
 ### 1. Start Ngrok
 Start an [ngrok](https://ngrok.com) tunnel for port `3000`:
@@ -43,21 +38,12 @@ Copy `.env.example` to `.env` and configure the following environment variables:
 
 ```bash
 # Your ngrok or server URL
-# E.g. 123.ngrok.io or myserver.fly.dev
+# E.g. 123.ngrok.io or myserver.fly.dev (exlude https://)
 SERVER="yourserverdomain.com"
 
 # Service API Keys
 OPENAI_API_KEY="sk-XXXXXX"
 DEEPGRAM_API_KEY="YOUR-DEEPGRAM-API-KEY"
-XI_API_KEY="YOUR-ELEVEN-LABS-API-KEY"
-# Available models at a signed GET request to /v1/models
-XI_MODEL_ID="eleven_turbo_v2"
-
-# Uses "Rachel" voice by default
-# See https://api.elevenlabs.io/v1/voices
-# or visit https://elevenlabs.io/voice-library
-# for a list of all available voices
-VOICE_ID="21m00Tcm4TlvDq8ikWAM"
 
 # Configure your Twilio credentials if you want
 # to make test calls using '$ npm test'.
@@ -93,7 +79,7 @@ twilio phone-numbers:update +1[your-twilio-number] --voice-url=https://your-serv
 This configuration tells Twilio to send incoming call audio to your app when someone calls your number. The app responds to the incoming call webhook with a [Stream](https://www.twilio.com/docs/voice/twiml/stream) TwiML verb that will connect an audio media stream to your websocket server.
 
 ## Application Workflow
-CallGPT coordinates the data flow between multiple different services including Deepgram, OpenAI, ElevenLabs, and Twilio Media Streams:
+CallGPT coordinates the data flow between multiple different services including Deepgram, OpenAI, and Twilio Media Streams:
 ![Call GPT Flow](https://github.com/twilio-labs/call-gpt/assets/1418949/0b7fcc0b-d5e5-4527-bc4c-2ffb8931139c)
 
 
