@@ -14,7 +14,7 @@
   "author": "Charlie Weems",
   "license": "MIT",
   "dependencies": {
-    "@deepgram/sdk": "^2.4.0",
+    "@deepgram/sdk": "^3.3.4",
     "colors": "^1.4.0",
     "dotenv": "^16.3.1",
     "express": "^4.19.2",
