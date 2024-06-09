@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { Buffer } = require('node:buffer');
 const EventEmitter = require('events');
 const fetch = require('node-fetch');
 
@@ -33,7 +34,7 @@ class TextToSpeechService extends EventEmitter {
         try {
           const blob = await response.blob();
           const audioArrayBuffer = await blob.arrayBuffer();
-          const base64String = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
+          const base64String = Buffer.from(audioArrayBuffer).toString('base64');
           this.emit('speech', partialResponseIndex, base64String, partialResponse, interactionCount);
         } catch (err) {
           console.log(err);
