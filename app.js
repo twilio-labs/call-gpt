@@ -1,5 +1,6 @@
 require('dotenv').config();
 require('colors');
+
 const express = require('express');
 const ExpressWs = require('express-ws');
 
@@ -7,6 +8,9 @@ const { GptService } = require('./services/gpt-service');
 const { StreamService } = require('./services/stream-service');
 const { TranscriptionService } = require('./services/transcription-service');
 const { TextToSpeechService } = require('./services/tts-service');
+const { recordingService } = require('./services/recording-service');
+
+const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
 const app = express();
 ExpressWs(app);
@@ -14,15 +18,16 @@ ExpressWs(app);
 const PORT = process.env.PORT || 3000;
 
 app.post('/incoming', (req, res) => {
-  res.status(200);
-  res.type('text/xml');
-  res.end(`
-  <Response>
-    <Connect>
-      <Stream url="wss://${process.env.SERVER}/connection" />
-    </Connect>
-  </Response>
-  `);
+  try {
+    const response = new VoiceResponse();
+    const connect = response.connect();
+    connect.stream({ url: `wss://${process.env.SERVER}/connection` });
+  
+    res.type('text/xml');
+    res.end(response.toString());
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.ws('/connection', (ws) => {
@@ -46,10 +51,15 @@ app.ws('/connection', (ws) => {
       if (msg.event === 'start') {
         streamSid = msg.start.streamSid;
         callSid = msg.start.callSid;
+        
         streamService.setStreamSid(streamSid);
         gptService.setCallSid(callSid);
-        console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
-        ttsService.generate({partialResponseIndex: null, partialResponse: 'Hello! I understand you\'re looking for a pair of AirPods, is that correct?'}, 1);
+
+        // Set RECORDING_ENABLED='true' in .env to record calls
+        recordingService(ttsService, callSid).then(() => {
+          console.log(`Twilio -> Starting Media Stream for ${streamSid}`.underline.red);
+          ttsService.generate({partialResponseIndex: null, partialResponse: 'Hello! I understand you\'re looking for a pair of AirPods, is that correct?'}, 0);
+        });
       } else if (msg.event === 'media') {
         transcriptionService.send(msg.media.payload);
       } else if (msg.event === 'mark') {
