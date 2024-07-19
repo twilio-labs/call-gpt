@@ -20,12 +20,17 @@ class GptService extends EventEmitter {
       { 'role': 'assistant', 'content': 'Hello! I understand you\'re looking for a pair of AirPods, is that correct?' },
     ],
     this.partialResponseIndex = 0;
+    this.isInterrupted = false;
   }
 
   // Add the callSid to the chat context in case
   // ChatGPT decides to transfer the call.
   setCallSid (callSid) {
     this.userContext.push({ 'role': 'system', 'content': `callSid: ${callSid}` });
+  }
+
+  interrupt () {
+    this.isInterrupted = true;
   }
 
   validateFunctionArgs (args) {
@@ -49,10 +54,11 @@ class GptService extends EventEmitter {
   }
 
   async completion(text, interactionCount, role = 'user', name = 'user') {
+    this.isInterrupted = false;
     this.updateUserContext(name, role, text);
 
     // Step 1: Send user transcription to Chat GPT
-    const stream = await this.openai.chat.completions.create({
+    let stream = await this.openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
       messages: this.userContext,
       tools: tools,
@@ -78,6 +84,10 @@ class GptService extends EventEmitter {
     }
 
     for await (const chunk of stream) {
+      if (this.isInterrupted) {
+        break;
+      }
+
       let content = chunk.choices[0]?.delta?.content || '';
       let deltas = chunk.choices[0].delta;
       finishReason = chunk.choices[0].finish_reason;
@@ -100,10 +110,7 @@ class GptService extends EventEmitter {
         const toolData = tools.find(tool => tool.function.name === functionName);
         const say = toolData.function.say;
 
-        this.emit('gptreply', {
-          partialResponseIndex: null,
-          partialResponse: say
-        }, interactionCount);
+        this.emit('gptreply', say, false, interactionCount);
 
         let functionResponse = await functionToCall(validatedArgs);
 
@@ -118,15 +125,11 @@ class GptService extends EventEmitter {
         // We use partialResponse to provide a chunk for TTS
         partialResponse += content;
         // Emit last partial response and add complete response to userContext
-        if (content.trim().slice(-1) === '•' || finishReason === 'stop') {
-          const gptReply = { 
-            partialResponseIndex: this.partialResponseIndex,
-            partialResponse
-          };
-
-          this.emit('gptreply', gptReply, interactionCount);
-          this.partialResponseIndex++;
+        if (content.trim().slice(-1) === '•') {
+          this.emit('gptreply', partialResponse, false, interactionCount);
           partialResponse = '';
+        } else if (finishReason === 'stop') {
+          this.emit('gptreply', partialResponse, true, interactionCount);
         }
       }
     }
