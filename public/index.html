@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twilio Voice JavaScript SDK Quickstart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Twilio Voice JavaScript SDK Quickstart</h1>
+      <button id="startup-button" class="bg-blue-500 mt-5 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Start up the Device</button>
+    </header>
+    <main id="controls">
+      <section class="left-column" id="info">
+        <h2>Your Device Info</h2>
+        <div id="client-name"></div>
+        <div id="output-selection" class="hide">
+          <label>Ringtone Devices</label>
+          <select id="ringtone-devices" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" multiple></select>
+          <label>Speaker Devices</label>
+          <select id="speaker-devices" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" multiple></select
+          ><br />
+          <button id="get-devices">Seeing "Unknown" devices?</button>
+        </div>
+      </section>
+      <section class="center-column">
+        <h2 class="instructions">Make a Call</h2>
+        <div id="call-controls" class="hide">
+          <form>
+            <input id="phone-number" type="hidden" placeholder="+15552221234" />
+            <button id="button-call" class="bg-blue-500 mt-5 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Call Voxray</button>
+          </form>
+          <button id="button-hangup-outgoing" class="hide">Hang Up</button>
+          <div id="incoming-call" class="hide">
+            <h2>Incoming Call Controls</h2>
+            <p class="instructions">
+              Incoming Call from <span id="incoming-number"></span>
+            </p>
+            <button id="button-accept-incoming">Accept</button>
+            <button id="button-reject-incoming">Reject</button>
+            <button id="button-hangup-incoming" class="hide">Hangup</button>
+          </div>
+          <div id="volume-indicators" class="hide">
+            <label>Mic Volume</label>
+            <div id="input-volume"></div>
+            <br /><br />
+            <label>Speaker Volume</label>
+            <div id="output-volume"></div>
+          </div>
+        </div>
+      </section>
+      <section class="right-column">
+        <h2>Event Log</h2>
+        <div class="hide" id="log"></div>
+      </section>
+    </main>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="twilio.min.js"></script>
+    <script type="text/javascript" src="quickstart.js"></script>
+  </body>
+</html>

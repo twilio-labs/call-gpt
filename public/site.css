@@ -1,0 +1,124 @@
+﻿@import url(https://fonts.googleapis.com/css?family=Share+Tech+Mono);
+
+body,
+p {
+  padding: 0;
+  margin: auto;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  margin-top: 0;
+  border-bottom: 1px solid black;
+}
+
+button {
+  margin-bottom: 10px;
+}
+
+label {
+  text-align: left;
+  font-size: 1.25em;
+  color: #777776;
+  display: block;
+}
+
+header {
+  text-align: center;
+}
+
+main {
+  padding: 3em;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.left-column,
+.center-column,
+.right-column {
+  width: 30%;
+  min-width: 16em;
+  margin: 0 1.5em;
+  text-align: center;
+}
+
+/* Left Column */
+#client-name {
+  text-align: left;
+  margin-bottom: 1em;
+  font-family: "Helvetica Light", Helvetica, sans-serif;
+  font-size: 1.25em;
+  color: #777776;
+}
+
+select {
+  width: 300px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+/* Center Column */
+input {
+  font-family: Helvetica-LightOblique, Helvetica, sans-serif;
+  font-style: oblique;
+  font-size: 1em;
+  width: 100%;
+  height: 2.5em;
+  padding: 0;
+  display: block;
+  margin: 10px 0;
+}
+
+div#volume-indicators {
+  padding: 10px;
+  margin-top: 20px;
+  width: 500px;
+  text-align: left;
+}
+
+div#volume-indicators > div {
+  display: block;
+  height: 20px;
+  width: 0;
+}
+
+/* Right Column */
+.right-column {
+  padding: 0 1.5em;
+}
+
+#log {
+  text-align: left;
+  border: 1px solid #686865;
+  padding: 10px;
+  height: 9.5em;
+  overflow-y: scroll;
+}
+
+.log-entry {
+  color: #686865;
+  font-family: "Share Tech Mono", "Courier New", Courier, fixed-width;
+  font-size: 1.25em;
+  line-height: 1.25em;
+  margin-left: 1em;
+  text-indent: -1.25em;
+  width: 90%;
+}
+
+/* Other Styles */
+.hide {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

@@ -1,23 +1,40 @@
 require('dotenv').config();
 require('colors');
 
+const path = require('path');
+
 const express = require('express');
 const ExpressWs = require('express-ws');
 
 const { GptService } = require('./services/gpt-service');
 const { TextService } = require('./services/text-service');
 const { recordingService } = require('./services/recording-service');
+const { tokenGenerator } = require('./services/token-generator');
 
 const app = express();
 ExpressWs(app);
 
 const PORT = process.env.PORT || 3000;
+app.use(express.static('public'));
+
+
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, './index.html'));
+});
+
+app.get('/token', (req, res) => {
+  res.send(tokenGenerator());
+});
 
 app.post('/incoming', (req, res) => {
   try {
     const response = `<Response>
       <Connect>
-        <Voxray url="wss://${process.env.SERVER}/sockets" welcomePrompt="Hi! Ask me anything!" />
+        <Voxray
+          url="wss://${process.env.SERVER}/sockets"
+          welcomePrompt="Hi! Ask me anything!"
+          voice="Google.en-US-Wavenet-G"
+        />
       </Connect>
     </Response>`;
     res.type('text/xml');
@@ -59,7 +76,7 @@ app.ws('/sockets', (ws) => {
         console.log('Todo: add interruption handling');
       }
     });
-      
+    
     gptService.on('gptreply', async (gptReply, final, icount) => {
       console.log(`Interaction ${icount}: GPT -> TTS: ${gptReply.partialResponse}`.green );
       textService.sendText(gptReply, final);
