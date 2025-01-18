@@ -13,7 +13,7 @@ tools.forEach((tool) => {
 class LlamaService extends EventEmitter {
   constructor() {
     super();
-    this.apiUrl = "http://54.221.193.59/generate"; // LLaMA server URL
+    this.apiUrl = "http://localhost:11434/api/chat"; // LLaMA server URL
     this.userContext = [
       {
         role: 'system',
@@ -60,30 +60,11 @@ class LlamaService extends EventEmitter {
 
   // Sends the user context and prompt to the LLaMA API
   async llama3(prompt) {
-    // const data = {
-    //   model: 'llama3.2',
-    //   messages: this.userContext.concat({ role: 'user', content: prompt }),
-    //   stream: false,
-    // };
-    this.userContext = this.userContext.concat({ role: 'user', content: prompt }); // Ensure the user prompt is added to the context
-    let promptMessage = ''; 
-
-    this.userContext.forEach(function (message) {
-      if (message.role === 'system') {
-        promptMessage += message.content; // System content as-is
-      } else if (message.role === 'user') {
-        promptMessage += "User: " + message.content + "\n"; // Prefix for user
-      } else if (message.role === 'assistant') {
-        promptMessage += "Assistant: " + message.content + "\n"; // Prefix for assistant
-      }
-    });
     const data = {
-      "inputs":promptMessage,                                                        
-      "parameters": {
-        "temperature": 0.7,
-        "max_new_tokens": 256
-      }
-    }
+      model: 'llama3.2',
+      messages: this.userContext.concat({ role: 'user', content: prompt }),
+      stream: false,
+    };
 
     try {
       const response = await axios.post(this.apiUrl, data, {
@@ -92,7 +73,7 @@ class LlamaService extends EventEmitter {
         },
       });
       console.log("raw response=>",response);
-      return response.data.generated_text;
+      return response.data.message.content; // Extract the assistant's response
     } catch (error) {
       console.error('Error communicating with LLaMA API:', error.response?.data || error.message);
       throw new Error('LLaMA API request failed.');
