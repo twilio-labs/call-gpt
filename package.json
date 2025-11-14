@@ -8,7 +8,9 @@
     "outbound": "node ./scripts/outbound-call.js",
     "test": "jest",
     "dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "realtime": "node src/index.js",
+    "realtime:dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "Charlie Weems",
@@ -23,7 +25,8 @@
     "openai": "^4.20.1",
     "twilio": "^4.19.3",
     "uuid": "^9.0.1",
-    "wavefile": "^11.0.0"
+    "wavefile": "^11.0.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.4.11",
